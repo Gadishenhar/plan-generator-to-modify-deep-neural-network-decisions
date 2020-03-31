@@ -9,8 +9,8 @@ df = pd.read_table('./tmp_dataset.txt', '|')
 # Clean up NaNs and nulls
 #df.dropna(inplace=True)
 # Convert labels Y->1, N->0
-df = (df.iloc[:, 24]).replace('Y', 1)
-df = (df.iloc[:, 24]).replace('N', 0)
+df.iloc[:, 24] = (df.iloc[:, 24]).replace('Y', 1)
+df.iloc[:, 24] = (df.iloc[:, 24]).replace('N', 0)
 
 # Define train , validation and test sets
 DF_LEN = len(df)
