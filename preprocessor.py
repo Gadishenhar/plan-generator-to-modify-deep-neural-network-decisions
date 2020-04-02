@@ -1,6 +1,5 @@
 import pandas as pd
 
-
 def print_useful_info(df_col, col_num):
     # TODO Figure out why set() takes forever
     print('Column #', col_num)
@@ -12,6 +11,7 @@ def print_useful_info(df_col, col_num):
 
 # Load data set
 df = pd.read_table('./tmp_dataset.txt', '|')
+
 # TODO Add column names to data frame / dataset file
 
 # Column 0 - LOAN IDENTIFIER
@@ -146,6 +146,20 @@ print_useful_info(df.iloc[:, 23], 23)
 print_useful_info(df.iloc[:, 24], 24)
 df.iloc[:, 24] = (df.iloc[:, 24]).replace('N', 0)
 df.iloc[:, 24] = (df.iloc[:, 24]).replace('Y', 1)
+
+#Remove unnecessary columns
+#Each column is named after their first row by default
+df = df.drop("100002239293",axis=1)
+df = df.drop("12/2018",axis=1)
+df = df.drop("02/2019",axis=1)
+
+#Calculate mean value and STD
+mean = df.mean()
+maximum =  df.max()
+minimum = df.min()
+
+#Normalization:
+df = (df - mean) / (maximum - minimum)
 
 # Export to new file
 df.to_csv('prep.txt')
