@@ -5,9 +5,8 @@ def print_useful_info(df_col, col_num):
     print('Column #', col_num)
     print('There are', len(df_col), 'total value')
     print('There are', len(set(df_col)), 'unique values')
-    print('There are', df_col.isna().sum(), 'missing values')
+    #print('There are', df_col.value_counts(dropna=False), 'missing values')
     print('')
-
 
 # Load data set
 df = pd.read_table('./tmp_dataset.txt', '|')
@@ -15,7 +14,6 @@ df = pd.read_table('./tmp_dataset.txt', '|')
 # TODO Add column names to data frame / dataset file
 
 # Column 0 - LOAN IDENTIFIER
-# TODO Keep this as assertion to make sure there really aren't duplicate identifiers
 # print(len(df.iloc[:, 0]))
 # print(len(set(df.iloc[:, 0])))
 print_useful_info(df.iloc[:, 0], 0)
@@ -25,6 +23,7 @@ print_useful_info(df.iloc[:, 1], 1)
 df.iloc[:, 1] = (df.iloc[:, 1]).replace('R', 1)  # R stands for Retail
 df.iloc[:, 1] = (df.iloc[:, 1]).replace('C', 2)  # C stands for Correspondent
 df.iloc[:, 1] = (df.iloc[:, 1]).replace('B', 3)  # B stands for Broker
+
 
 # Column 2 - SELLER NAME
 # TODO Consider using deterministic numbering to the sellers (sets are not)
@@ -86,6 +85,7 @@ df.iloc[:, 13] = (df.iloc[:, 13]).replace('N', 0)
 df.iloc[:, 13] = (df.iloc[:, 13]).replace('Y', 1)
 df.iloc[:, 13] = (df.iloc[:, 13]).replace('U', 2)
 
+
 # Column 14 - LOAN PURPOSE
 print_useful_info(df.iloc[:, 14], 14)
 df.iloc[:, 14] = (df.iloc[:, 14]).replace('P', 0)
@@ -96,10 +96,10 @@ df.iloc[:, 14] = (df.iloc[:, 14]).replace('U', 3)
 # Column 15 - PROPERTY TYPE
 print_useful_info(df.iloc[:, 15], 15)
 df.iloc[:, 15] = (df.iloc[:, 15]).replace('SF', 0)
-df.iloc[:, 15] = (df.iloc[:, 15]).replace('CO', 1)
-df.iloc[:, 15] = (df.iloc[:, 15]).replace('CP', 2)
+df.iloc[:, 15] = (df.iloc[:, 15]).replace('PU', 1)
+df.iloc[:, 15] = (df.iloc[:, 15]).replace('CO', 2)
 df.iloc[:, 15] = (df.iloc[:, 15]).replace('MH', 3)
-df.iloc[:, 15] = (df.iloc[:, 15]).replace('PU', 4)
+df.iloc[:, 15] = (df.iloc[:, 15]).replace('CP', 4)
 
 # Column 16 - NUMBER OF UNITS
 # TODO Consider if this is beneficial or hurts us
@@ -109,8 +109,8 @@ print_useful_info(df.iloc[:, 16], 16)
 # Column 17 - OCCUPANCY TYPE
 print_useful_info(df.iloc[:, 17], 17)
 df.iloc[:, 17] = (df.iloc[:, 17]).replace('P', 0)
-df.iloc[:, 17] = (df.iloc[:, 17]).replace('S', 1)
-df.iloc[:, 17] = (df.iloc[:, 17]).replace('I', 2)
+df.iloc[:, 17] = (df.iloc[:, 17]).replace('I', 1)
+df.iloc[:, 17] = (df.iloc[:, 17]).replace('S', 2)
 df.iloc[:, 17] = (df.iloc[:, 17]).replace('U', 3)
 
 # Column 18 - PROPERTY STATE
@@ -152,14 +152,15 @@ df.iloc[:, 24] = (df.iloc[:, 24]).replace('Y', 1)
 df = df.drop("100002239293",axis=1)
 df = df.drop("12/2018",axis=1)
 df = df.drop("02/2019",axis=1)
-
-#Calculate mean value and STD
-mean = df.mean()
-maximum =  df.max()
-minimum = df.min()
+df = df.drop("FRM",axis=1)
 
 #Normalization:
-df = (df - mean) / (maximum - minimum)
+mean = df.mean()
+std = df.std()
+df = (df - mean) / std
+maximum =  df.max()
+minimum = df.min()
+df = df / (maximum - minimum)
 
 # Export to new file
 df.to_csv('prep.txt')
