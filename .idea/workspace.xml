@@ -33,7 +33,7 @@
     <property name="last_opened_file_path" value="$PROJECT_DIR$/../Polaris/fanniemae/mortgage_preprocess.py" />
     <property name="settings.editor.selected.configurable" value="editor.preferences.fonts.default" />
   </component>
-  <component name="RunManager" selected="Python.preprocessor">
+  <component name="RunManager" selected="Python.main">
     <configuration name="main" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="plan-generator-to-modify-deep-neural-network-decisions" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -78,8 +78,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.preprocessor" />
         <item itemvalue="Python.main" />
+        <item itemvalue="Python.preprocessor" />
       </list>
     </recent_temporary>
   </component>
@@ -107,22 +107,22 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="260" y="278" key="FileChooserDialogImpl/0.0.1920.1040@0.0.1920.1040" timestamp="1585898751727" />
-    <state width="1016" height="496" key="GridCell.Tab.0.bottom" timestamp="1585908686694">
+    <state width="1062" height="667" key="GridCell.Tab.0.bottom" timestamp="1586202786760">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1016" height="496" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1585908686694" />
-    <state width="1016" height="496" key="GridCell.Tab.0.center" timestamp="1585908686694">
+    <state width="1062" height="667" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1586202786760" />
+    <state width="1062" height="667" key="GridCell.Tab.0.center" timestamp="1586202786760">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1016" height="496" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1585908686694" />
-    <state width="1016" height="496" key="GridCell.Tab.0.left" timestamp="1585908686694">
+    <state width="1062" height="667" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1586202786760" />
+    <state width="1062" height="667" key="GridCell.Tab.0.left" timestamp="1586202786760">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1016" height="496" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1585908686694" />
-    <state width="1016" height="496" key="GridCell.Tab.0.right" timestamp="1585908686694">
+    <state width="1062" height="667" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1586202786760" />
+    <state width="1062" height="667" key="GridCell.Tab.0.right" timestamp="1586202786760">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1016" height="496" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1585908686694" />
+    <state width="1062" height="667" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1586202786760" />
     <state width="1899" height="258" key="GridCell.Tab.1.bottom" timestamp="1585903390732">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>

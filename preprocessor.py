@@ -188,9 +188,9 @@ def main(acq_path, per_path, out_path):
 
     # Replace all foreclosure dates (or their lack of) with 0 or 1 to represent whether a default took place
     per_df.fillna(0, inplace=True)
-    print(set(per_df.iloc[:, 1]))
     per_df.loc[per_df[PER_COL_NAMES[1]] != 0, PER_COL_NAMES[1]] = 1
-    print(set(per_df.iloc[:, 1]))
+    per_df.iloc[:, -1] = per_df.iloc[:, -1].astype(int)
+    print(per_df.iloc[:, -1])
 
     # Merge with the acquisition dataset, based on the load identifier
     print('Merging with performance data...\n')
