@@ -150,6 +150,9 @@ def prep_acq_columns(df, COL_NAMES):
     df.iloc[:, 24].replace('N', 0, inplace=True)
     df.iloc[:, 24].replace('Y', 1, inplace=True)
 
+    # Drop any leftover entires that contains NaNs (should be a single entry, due to a single NaN in column 9)
+    df.dropna(inplace=True)
+
     return df, to_be_deleted
 
 
