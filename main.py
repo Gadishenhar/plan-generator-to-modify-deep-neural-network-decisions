@@ -27,19 +27,7 @@ class Dataset(torch.utils.data.Dataset):
 
         return sample
 
-# Define train , validation and test sets
-df = pd.read_csv('Dataset/prep.txt')
-DF_LEN = len(df)
-TRAIN_LEN = round(DF_LEN * 0.6)
-VAL_LEN = round(DF_LEN * 0.2)
-TEST_LEN = DF_LEN - TRAIN_LEN - VAL_LEN
 
-train = df.iloc[1:TRAIN_LEN, :]
-train.to_csv('Dataset/train.txt', index=False)
-val = df.iloc[(1+TRAIN_LEN):(TRAIN_LEN+VAL_LEN), :]
-val.to_csv('Dataset/val.txt', index=False)
-test = df.iloc[-(TEST_LEN-1):, :]
-test.to_csv('Dataset/test.txt', index=False)
 
 train_dataset = Dataset('Dataset/train.txt')
 train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=False)
