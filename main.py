@@ -2,7 +2,7 @@ import pandas as pd
 import torch
 import torch.nn as nn
 import torch.optim as optim
-
+import torch.utils.data
 
 class Dataset(torch.utils.data.Dataset): #Defining the dataset
 
@@ -97,7 +97,7 @@ def main(PREP_PATH):
     # Hyper parameters
     BATCH_SIZE = 500
     LEARNING_RATE = 0.001  # The optimal learning rate for the Adam optimizer
-    EPOCH_COUNT = 1
+    EPOCH_COUNT = 30
     DROPOUT_RATE = 0.1
 
     # Initialize train dataset and loader
@@ -134,6 +134,8 @@ def main(PREP_PATH):
             if i % 20 == 19:  # print every 20 mini-batches
                 print('[%d, %5d] loss: %.3f' % (epoch + 1, i + 1, running_loss / 20))
                 running_loss = 0.0
+
+            torch.save(net.state_dict(), 'Models/Model.pkl')
 
     # Test the network
     test_dataset = Dataset(PREP_PATH + 'test.txt')  # Sending to the class "dataset" only the samples that we chose to be the test samples (20% of the data)
@@ -176,3 +178,5 @@ def main(PREP_PATH):
 
 if __name__ == '__main__':
     main('Dataset/prep/')
+
+
