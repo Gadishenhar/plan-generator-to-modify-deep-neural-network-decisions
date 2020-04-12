@@ -3,11 +3,12 @@ import sys
 
 
 def print_useful_info(acq_df_col, col_num):
-    print('Column #', col_num)
-    print('There are', len(acq_df_col), 'total entries')
-    print('There are', acq_df_col.nunique(), 'unique values')
-    print('There are', sum(acq_df_col.isnull()), 'missing values')
-    print('')
+    return 0
+    #print('Column #', col_num)
+    #print('There are', len(acq_df_col), 'total entries')
+    #print('There are', acq_df_col.nunique(), 'unique values')
+    #print('There are', sum(acq_df_col.isnull()), 'missing values')
+    #print('')
 
 
 def prep_acq_columns(df, COL_NAMES):
@@ -174,41 +175,45 @@ def split_train_val_test(df, OUT_PATH, TRAIN_VAL_TEST_SPLIT):
     ZEROS_TRAIN_LEN = round(ZEROS_LEN * TRAIN_VAL_TEST_SPLIT[0])
     ONES_TRAIN_LEN = round(ONES_LEN * TRAIN_VAL_TEST_SPLIT[0])
 
+    # The number of zeros should be only 9 times greater than the number of ones
+    #ZEROS_TRAIN_LEN = min(ZEROS_TRAIN_LEN, 2*ONES_TRAIN_LEN)
+
     ZEROS_VAL_LEN = round(ZEROS_LEN * TRAIN_VAL_TEST_SPLIT[1])
     ONES_VAL_LEN = round(ONES_LEN * TRAIN_VAL_TEST_SPLIT[1])
+    #ZEROS_VAL_LEN = min(ZEROS_VAL_LEN, 2 * ONES_VAL_LEN)
 
     ZEROS_TEST_LEN = ZEROS_LEN - ZEROS_TRAIN_LEN - ZEROS_VAL_LEN
     ONES_TEST_LEN = ONES_LEN - ONES_TRAIN_LEN - ONES_VAL_LEN
+    #ZEROS_TEST_LEN = min(ZEROS_TEST_LEN, 2 * ONES_TEST_LEN)
 
     train = zeros_df.iloc[:ZEROS_TRAIN_LEN, :]
     train = train.append(ones_df.iloc[:ONES_TRAIN_LEN, :])
     train = train.sample(frac=1).reset_index(drop=True)
-    train.to_csv(OUT_PATH + 'train.txt', index=False, header=False)
 
     PER0 = sum(train.iloc[:, -1] == 0) / len(train) * 100
     PER1 = 100 - PER0
-    print('The train data set contains ', PER0, 'zeros and ', PER1)
+    #print('The train data set contains ', PER0, 'zeros and ', PER1)
 
     val = zeros_df.iloc[ZEROS_TRAIN_LEN:(ZEROS_TRAIN_LEN + ZEROS_VAL_LEN), :]
     val = val.append(ones_df.iloc[ONES_TRAIN_LEN:(ONES_TRAIN_LEN + ONES_VAL_LEN), :])
     val = val.sample(frac=1).reset_index(drop=True)
-    val.to_csv(OUT_PATH + 'val.txt', index=False, header=False)
 
     PER0 = sum(val.iloc[:, -1] == 0) / len(val) * 100
     PER1 = 100 - PER0
-    print('The validation data set contains ', PER0, 'zeros and ', PER1)
+    #print('The validation data set contains ', PER0, 'zeros and ', PER1)
 
     test = zeros_df.iloc[-ZEROS_TEST_LEN:, :]
     test = test.append(ones_df.iloc[-ONES_TEST_LEN:, :])
     test = test.sample(frac=1).reset_index(drop=True)
-    test.to_csv(OUT_PATH + 'test.txt', index=False, header=False)
 
     PER0 = sum(test.iloc[:, -1] == 0) / len(test) * 100
     PER1 = 100 - PER0
-    print('The test data set contains ', PER0, 'zeros and ', PER1)
+    #print('The test data set contains ', PER0, 'zeros and ', PER1)
+
+    return (train, val, test)
 
 
-def main(acq_path, per_path, out_path, TRAIN_VAL_TEST_SPLIT):
+def preprocess_single_pair(acq_path, per_path):
 
     # Load data set
     ACQ_COL_NAMES = [
@@ -254,31 +259,52 @@ def main(acq_path, per_path, out_path, TRAIN_VAL_TEST_SPLIT):
     per_df.iloc[:, -1] = per_df.iloc[:, -1].astype(int)
 
     # Merge with the acquisition data set, based on the load identifier
-    print('Merging with performance data...\n')
+    #print('Merging with performance data...\n')
     df = pd.merge(acq_df, per_df, on=ACQ_COL_NAMES[0], how='inner')
 
     # Remove unnecessary columns
-    print('Removing unnecessary columns...\n')
+    #print('Removing unnecessary columns...\n')
     df.drop(to_be_deleted, axis=1, inplace=True)
 
-    # Normalization:
-    print('Normalizing...\n')
-    df = (df - df.mean()) / df.std()
-    df = (df - df.min()) / (df.max() - df.min())
+    # Normalization (note this ignores the labels):
+    #print('Normalizing...\n')
+    features = df.iloc[:, :-1]
+    df.iloc[:, :-1] = (features - features.mean()) / features.std()
+    df.iloc[:, :-1] = (features - features.min()) / (features.max() - features.min())
 
+    # TODO Delete this if new code version works
     # This normalization included our labels, which are now ruined. However, there are still only two values. We need to
     # convert them back to 0 and 1
-    df.iloc[:, -1:].replace(df.iloc[:, -1:].min(), 0)
-    df.iloc[:, -1:].replace(df.iloc[:, -1:].max(), 1)
+    #df.iloc[:, -1:].replace(df.iloc[:, -1:].min(), 0)
+    #df.iloc[:, -1:].replace(df.iloc[:, -1:].max(), 1)
 
-    print('Splitting to train, validation and test sets...\n')
-    split_train_val_test(df, OUT_PATH, TRAIN_VAL_TEST_SPLIT)
+    #print('Splitting to train, validation and test sets...\n')
+    return split_train_val_test(df, OUT_PATH, TRAIN_VAL_TEST_SPLIT)
+
+
+def main(acq_path, per_path, out_path, TRAIN_VAL_TEST_SPLIT):
+
+    train, val, test = (pd.DataFrame(), pd.DataFrame(), pd.DataFrame())
+    for year in range(2000, 2018+1):
+        for quarter in range(1, 4+1):
+            acquisition_file_name = acq_path + '/Acquisition_' +str(year) + 'Q' + str(quarter) + '.txt'
+            performance_file_name = per_path + '/Performance_' +str(year) + 'Q' + str(quarter) + '.txt'
+            print('Currently processing', year, 'quarter', quarter)
+            new_train, new_val, new_test = preprocess_single_pair(acquisition_file_name, performance_file_name)
+
+            #train = train.append(new_train)
+            #val = val.append(new_val)
+            #test = test.append(new_test)
+
+            # Shuffle one last time, so that the entry year will not matter, and save the sets
+            new_train.sample(frac=1).to_csv(OUT_PATH + 'train' + str(year) + 'Q' + str(quarter) + '.txt', index=False, header=False)
+            new_val.sample(frac=1).to_csv(OUT_PATH + 'val' + str(year) + 'Q' + str(quarter) + '.txt', index=False, header=False)
+            new_test.sample(frac=1).to_csv(OUT_PATH + 'test' + str(year) + 'Q' + str(quarter) + '.txt', index=False, header=False)
 
 
 if __name__ == '__main__':
-    print(sys.argv[0])
-    ACQ_PATH = 'Dataset/acq.txt'
-    PER_PATH = 'Dataset/per.txt'
-    OUT_PATH = 'Dataset/prep/'
+    ACQ_PATH = 'Dataset/acquisition'
+    PER_PATH = 'Dataset/performance'
+    OUT_PATH = 'Dataset/prep_unbiased/'
     TRAIN_VAL_TEST_SPLIT = [0.6, 0.2, 0.2]
     main(ACQ_PATH, PER_PATH, OUT_PATH, TRAIN_VAL_TEST_SPLIT)
