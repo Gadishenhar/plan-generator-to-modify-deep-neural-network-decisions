@@ -97,6 +97,8 @@ def compute_loss(net, dataloader):
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     loss = 0
     count = 0
+    count0 = 0
+    count1 = 0
     critertion = nn.BCELoss()
     with torch.no_grad():  # Initializing the gradients to zero
         for data in dataloader:  # Iterate over the test samples
@@ -106,9 +108,17 @@ def compute_loss(net, dataloader):
 
             outputs = net(features)  # Fetching the network's predictions
             loss += critertion(outputs, labels)
+            labeled0 = labels==0
+            labeled1 = labels==1
+            outputs0 = outputs==0
+            outputs1 = outputs==1
             count += len(labels)
+            count0 += len(labeled0)
+            count1 += len(labeled1)
+            sens = sum(outputs1==labeled1)
+            spec = sum(labeled0==outputs0)
 
-    return loss / count
+    return (loss/count) , (sens/count1) , (spec/count0)
 
 
 def main(PREP_PATH):
@@ -116,7 +126,7 @@ def main(PREP_PATH):
     # Hyper parameters
     BATCH_SIZE = 500
     LEARNING_RATE = 0.001  # The optimal learning rate for the Adam optimizer
-    EPOCH_COUNT = 2
+    EPOCH_COUNT = 1
     DROPOUT_RATE = 0.1
 
     # Initialize train and validation datasets and loaders
@@ -165,15 +175,19 @@ def main(PREP_PATH):
 
         # At the end of each epoch, remember the current train and validation loss
         print('Computing total training loss...')
-        train_loss.append(compute_loss(net, train_dataloader))
+        train_loss , train_sens , train_spec = compute_loss(net, train_dataloader)
+        #train_loss.append(train_loss)
         print('Computing total validation loss...')
-        val_loss.append(compute_loss(net, val_dataloader))
+        val_loss , val_sens , val_spec = compute_loss(net, val_dataloader)
+        #val_loss.append(val_sens)
 
         # GADI Please note this is the output model name and it is saved after every epoch. Be careful not to override files :)
         torch.save(net.state_dict(), 'models/split_33_66_batchsize_' + str(BATCH_SIZE) + '_lr_' + str(LEARNING_RATE) + '_dropout_'+ str(DROPOUT_RATE) + '_epoch_' + str(epoch) +'.pkl')
 
     print('Final training losses are', train_loss)
     print('Final validation losses are', val_loss)
+    print('Final validation sesitivity is', val_sens)
+    print('Final validation specificity is', val_spec)
 
     # GADI Uncomment this if you want to test the test set too
     """

@@ -213,10 +213,10 @@ def split_train_val_test(df, OUT_PATH, TRAIN_VAL_TEST_SPLIT):
     return (train, val, test)
 
 
-def preprocess_single_pair(acq_path, per_path):
+def preprocess_merged_df(df):
 
     # Load data set
-    ACQ_COL_NAMES = [
+    COL_NAMES = [
         'LOAN_ID',
         'ORIG_CHAN',
         'SELLER_NAME',
@@ -241,26 +241,12 @@ def preprocess_single_pair(acq_path, per_path):
         'PROD_TYPE',
         'CO_BOR_C_SCORE',
         'INSUR_TYPE',
-        'RELOC_IND'
+        'RELOC_IND',
+        'DEFAULT'
     ]
-    acq_df = pd.read_csv(acq_path, sep='|', names=ACQ_COL_NAMES)
 
     # First, convert all entries to numerical values, fill missing values and remember which columns should be deleted
-    acq_df, to_be_deleted = prep_acq_columns(acq_df, ACQ_COL_NAMES)
-
-    # Before we remove the identifier column, we need to process the performance data
-    PER_COL_NAMES = [ACQ_COL_NAMES[0], 'DEFAULT']
-    per_df = pd.read_csv(per_path, sep='|', usecols=[0, 15], names=PER_COL_NAMES)
-    per_df.drop_duplicates(subset=ACQ_COL_NAMES[0], keep='last', inplace=True)
-
-    # Replace all foreclosure dates (or their lack of) with 0 or 1 to represent whether a default took place
-    per_df.fillna(0, inplace=True)
-    per_df.loc[per_df[PER_COL_NAMES[1]] != 0, PER_COL_NAMES[1]] = 1
-    per_df.iloc[:, -1] = per_df.iloc[:, -1].astype(int)
-
-    # Merge with the acquisition data set, based on the load identifier
-    #print('Merging with performance data...\n')
-    df = pd.merge(acq_df, per_df, on=ACQ_COL_NAMES[0], how='inner')
+    df, to_be_deleted = prep_acq_columns(df, COL_NAMES)
 
     # Remove unnecessary columns
     #print('Removing unnecessary columns...\n')
@@ -272,34 +258,48 @@ def preprocess_single_pair(acq_path, per_path):
     df.iloc[:, :-1] = (features - features.mean()) / features.std()
     df.iloc[:, :-1] = (features - features.min()) / (features.max() - features.min())
 
-    # TODO Delete this if new code version works
-    # This normalization included our labels, which are now ruined. However, there are still only two values. We need to
-    # convert them back to 0 and 1
-    #df.iloc[:, -1:].replace(df.iloc[:, -1:].min(), 0)
-    #df.iloc[:, -1:].replace(df.iloc[:, -1:].max(), 1)
-
-    #print('Splitting to train, validation and test sets...\n')
+    print('Splitting to train, validation and test sets...\n')
     return split_train_val_test(df, OUT_PATH, TRAIN_VAL_TEST_SPLIT)
 
 
 def main(acq_path, per_path, out_path, TRAIN_VAL_TEST_SPLIT):
 
-    train, val, test = (pd.DataFrame(), pd.DataFrame(), pd.DataFrame())
+    # Firstly, go over all of the acquisition files, and merge them with the correct performance data
+    merged_df = pd.DataFrame() #Initialize an empty dataframe
     for year in range(2000, 2018+1):
         for quarter in range(1, 4+1):
             acquisition_file_name = acq_path + '/Acquisition_' +str(year) + 'Q' + str(quarter) + '.txt'
             performance_file_name = per_path + '/Performance_' +str(year) + 'Q' + str(quarter) + '.txt'
             print('Currently processing', year, 'quarter', quarter)
-            new_train, new_val, new_test = preprocess_single_pair(acquisition_file_name, performance_file_name)
+            merged_df.append(merge_aqs_per(per_path, acq_path)) #adding this quarter's united dataset to "merged_df"
+    merged_df.to_csv(OUT_PATH + 'merged'+ '.txt', index=False, header=False)
 
-            #train = train.append(new_train)
-            #val = val.append(new_val)
-            #test = test.append(new_test)
+    # Next, preprocess the single dataframe
+    new_train, new_val, new_test = preprocess_merged_df(merged_df)
 
-            # Shuffle one last time, so that the entry year will not matter, and save the sets
-            new_train.sample(frac=1).to_csv(OUT_PATH + 'train' + str(year) + 'Q' + str(quarter) + '.txt', index=False, header=False)
-            new_val.sample(frac=1).to_csv(OUT_PATH + 'val' + str(year) + 'Q' + str(quarter) + '.txt', index=False, header=False)
-            new_test.sample(frac=1).to_csv(OUT_PATH + 'test' + str(year) + 'Q' + str(quarter) + '.txt', index=False, header=False)
+    # Shuffle one last time, so that the entry year will not matter, and save the sets
+    new_train.sample(frac=1).to_csv(OUT_PATH + 'train' + '.txt', index=False, header=False) #"sample" takes random chuncks of the data, so we choose a piece in the size of 1, meaning creating randomlization
+    new_val.sample(frac=1).to_csv(OUT_PATH + 'val' + '.txt', index=False, header=False)
+    new_test.sample(frac=1).to_csv(OUT_PATH + 'test' + '.txt', index=False, header=False)
+
+
+def merge_aqs_per(per_path, acq_path):
+
+    # Before we remove the identifier column, we need to process the performance data
+    PER_COL_NAMES = ['LOAN_ID', 'DEFAULT'] #Choose two columns from the performance data: the loan's identifier + "DEFAULT": the date in which a costumer's house was confiscated
+    per_df = pd.read_csv(per_path, sep='|', usecols=[0, 15], names=PER_COL_NAMES) #load the aquisition features
+    per_df.drop_duplicates(subset='LOAN_ID', keep='last', inplace=True) #removing all duplicate rows from aquisition
+
+    # Replace all foreclosure dates (or their lack of) with 0 or 1 to represent whether a default took place
+    per_df.fillna(0, inplace=True) #Filling all the NaNs with zeroes
+    per_df.loc[per_df[PER_COL_NAMES[1]] != 0, PER_COL_NAMES[1]] = 1 #in any case there's a result other than 0 it means that the house indeed was confiscated so we write "1"
+    per_df.iloc[:, -1] = per_df.iloc[:, -1].astype(int) #Converting to integers
+
+    acq_df = pd.read_csv(acq_path, sep="|")
+
+    # Merge with the acquisition data set, based on the load identifier
+    #print('Merging with performance data...\n')
+    df = pd.merge(acq_df, per_df, on='LOAN_ID', how='inner') #merge according to Loan indentifier
 
 
 if __name__ == '__main__':
