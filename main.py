@@ -99,6 +99,8 @@ def compute_loss(net, dataloader):
     count = 0
     count0 = 0
     count1 = 0
+    sens = 0
+    spec = 0
     critertion = nn.BCELoss()
     with torch.no_grad():  # Initializing the gradients to zero
         for data in dataloader:  # Iterate over the test samples
@@ -115,8 +117,8 @@ def compute_loss(net, dataloader):
             count += len(labels)
             count0 += len(labeled0)
             count1 += len(labeled1)
-            sens = sum(outputs1==labeled1)
-            spec = sum(labeled0==outputs0)
+            sens += sum(outputs1==labeled1)
+            spec += sum(labeled0==outputs0)
 
     return (loss/count) , (sens/count1) , (spec/count0)
 
@@ -174,10 +176,10 @@ def main(PREP_PATH):
                 running_loss = 0.0
 
         # At the end of each epoch, remember the current train and validation loss
-        print('Computing total training loss...')
+        print('Computing total training loss, sensitivity and specificity...')
         train_loss , train_sens , train_spec = compute_loss(net, train_dataloader)
         #train_loss.append(train_loss)
-        print('Computing total validation loss...')
+        print('Computing total validation loss, sensitivity and specificity...')
         val_loss , val_sens , val_spec = compute_loss(net, val_dataloader)
         #val_loss.append(val_sens)
 
