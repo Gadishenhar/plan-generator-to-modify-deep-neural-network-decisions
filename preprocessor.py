@@ -249,6 +249,32 @@ def merge_acq_per_data(acq_path, per_path):
     return df
 
 
+def bias_labels(df, zeros_to_ones_ratio):
+
+    zeros_df = df[df.iloc[:, -1] == 0]
+    ZEROS_LEN = len(zeros_df)
+    ones_df = df[df.iloc[:, -1] == 1]
+    ONES_LEN = len(ones_df)
+
+    # Set new length for zeros, based on the ratio
+    NEW_ZEROS_LEN = min(ZEROS_LEN, ONES_LEN * zeros_to_ones_ratio)
+    zeros_df = zeros_df.sample(frac=NEW_ZEROS_LEN/ZEROS_LEN)
+
+    df = zeros_df.append(ones_df).sample(frac=1)
+
+    # Print some final stats
+    print('Total len', len(df))
+    print('Number of zeros', NEW_ZEROS_LEN),
+    print('Percent of zeros', NEW_ZEROS_LEN / len(df) * 100)
+    print('Number of ones', ONES_LEN),
+    print('Percent of ones', ONES_LEN / len(df) * 100)
+    print()
+
+    # Append and shuffle the result
+    return df
+
+
+
 def main(acq_path, per_path, out_path, TRAIN_VAL_TEST_SPLIT):
 
     """
@@ -319,7 +345,6 @@ def main(acq_path, per_path, out_path, TRAIN_VAL_TEST_SPLIT):
                 df.iloc[:, :-1] = (df.iloc[:, :-1] - features_mean) / features_std
                 df.iloc[:, :-1] = (df.iloc[:, :-1] - features_mean) / (features_max - features_min)
                 df.to_csv(out_path + 'NormTokAcqPer_' + suffix, index=False, header=False)
-    """
 
     # Iter 5: Next, we need to go over each normalized tokenized data set file, and split it to a train file, a
     # validation file and a test file, using the given split.
@@ -332,35 +357,68 @@ def main(acq_path, per_path, out_path, TRAIN_VAL_TEST_SPLIT):
                 df = pd.read_csv(file_name, names=CLEANED_COL_NAMES)
                 train, val, test = split_train_val_test(df, OUT_PATH, TRAIN_VAL_TEST_SPLIT)
                 train.to_csv(OUT_PATH + 'train' + suffix, index=False, header=False)
-                train.to_csv(OUT_PATH + 'val' + suffix, index=False, header=False)
-                train.to_csv(OUT_PATH + 'test' + suffix, index=False, header=False)
-
-    #
-    #
-    # save data about them that we will need later.
-    # The things saved in this iteration are:
-    # * An aggregate list of all of the unique values (for the seller name and property state columns), as well as
-    #   their popularity in the data set. This is done so we can give these non-numerical values consistent values.
-
+                val.to_csv(OUT_PATH + 'val' + suffix, index=False, header=False)
+                test.to_csv(OUT_PATH + 'test' + suffix, index=False, header=False)
 
     """
 
-    # Merge all of newly created files to a single file, and delete all of the old files
-    # TODO Do this in code. Currently, done manually while debugger is paused
+    # The next step must be done manually (for now) outside of python:
+    # * merge all of the new files to three (train, val and test)
+    # TODO Write code for it here
 
-    # Load the merged dataset
+    # Next, we open the train, val and test files and bias the labels
+    # First time, a 10%, 90% bias
+    print('Biasing train with 1-9 ratio...')
+    df = pd.read_csv(OUT_PATH + 'mergedTrain.txt')
+    ZEROS_LEN = len(df[df.iloc[:, -1] == 0])
+    ONES_LEN = len(df[df.iloc[:, -1] == 1])
+    TOT_LEN = ZEROS_LEN + ONES_LEN
+    print('Total len', len(df))
+    print('Number of zeros', ZEROS_LEN),
+    print('Percent of zeros', ZEROS_LEN / TOT_LEN * 100)
+    print('Number of ones', ONES_LEN),
+    print('Percent of ones', ONES_LEN / TOT_LEN * 100)
+    print()
+    bias_labels(df, 9).to_csv(OUT_PATH + 'biased_10_90_train.txt', index=False, header=False)
 
-    merged_df = pd.read_csv(OUT_PATH + 'merged.txt', names=COL_NAMES)
-    print(merged_df)
+    print('Biasing validation with 1-9 ratio...')
+    df = pd.read_csv(OUT_PATH + 'mergedVal.txt')
+    ZEROS_LEN = len(df[df.iloc[:, -1] == 0])
+    ONES_LEN = len(df[df.iloc[:, -1] == 1])
+    TOT_LEN = ZEROS_LEN + ONES_LEN
+    print('Total len', len(df))
+    print('Number of zeros', ZEROS_LEN),
+    print('Percent of zeros', ZEROS_LEN / TOT_LEN * 100)
+    print('Number of ones', ONES_LEN),
+    print('Percent of ones', ONES_LEN / TOT_LEN * 100)
+    print()
+    bias_labels(df, 9).to_csv(OUT_PATH + 'biased_10_90_val.txt', index=False, header=False)
 
-    # Next, preprocess the single dataframe
-    new_train, new_val, new_test = preprocess_merged_df(merged_df)
+    print('Biasing test with 1-9 ratio...')
+    df = pd.read_csv(OUT_PATH + 'mergedTest.txt')
+    ZEROS_LEN = len(df[df.iloc[:, -1] == 0])
+    ONES_LEN = len(df[df.iloc[:, -1] == 1])
+    TOT_LEN = ZEROS_LEN + ONES_LEN
+    print('Total len', len(df))
+    print('Number of zeros', ZEROS_LEN),
+    print('Percent of zeros', ZEROS_LEN / TOT_LEN * 100)
+    print('Number of ones', ONES_LEN),
+    print('Percent of ones', ONES_LEN / TOT_LEN * 100)
+    print()
+    bias_labels(df, 9).to_csv(OUT_PATH + 'biased_10_90_test.txt', index=False, header=False)
 
-    # Shuffle one last time, so that the entry year will not matter, and save the sets
-    new_train.sample(frac=1).to_csv(OUT_PATH + 'train' + '.txt', index=False, header=False) #"sample" takes random chuncks of the data, so we choose a piece in the size of 1, meaning creating randomlization
-    new_val.sample(frac=1).to_csv(OUT_PATH + 'val' + '.txt', index=False, header=False)
-    new_test.sample(frac=1).to_csv(OUT_PATH + 'test' + '.txt', index=False, header=False)
-    """
+    # Then again, for 33-66 split
+    print('Biasing train with 1-2 ratio...')
+    df = pd.read_csv(OUT_PATH + 'mergedTrain.txt')
+    bias_labels(df, 2).to_csv(OUT_PATH + 'biased_33_66_train.txt', index=False, header=False)
+
+    print('Biasing validation with 1-2 ratio...')
+    df = pd.read_csv(OUT_PATH + 'mergedVal.txt')
+    bias_labels(df, 2).to_csv(OUT_PATH + 'biased_33_66_val.txt', index=False, header=False)
+
+    print('Biasing test with 1-2 ratio...')
+    df = pd.read_csv(OUT_PATH + 'mergedTest.txt')
+    bias_labels(df, 2).to_csv(OUT_PATH + 'biased_33_66_test.txt', index=False, header=False)
 
 
 if __name__ == '__main__':
