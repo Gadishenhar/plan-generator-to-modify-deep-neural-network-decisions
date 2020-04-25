@@ -94,33 +94,52 @@ class Net(nn.Module):
 
 def compute_loss(net, dataloader):
 
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    #device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     loss = 0
     count = 0
     count0 = 0
     count1 = 0
     sens = 0
     spec = 0
+    num_of_ones = 0
+    num_of_zeros = 0
     critertion = nn.BCELoss()
     with torch.no_grad():  # Initializing the gradients to zero
         for data in dataloader:  # Iterate over the test samples
 
-            features = data['features'].to(device)
-            labels = data['label'].view(-1, 1).to(device)
+            features = data['features']#.to(device)
+            labels = data['label'].view(-1, 1)#.to(device)
 
             outputs = net(features)  # Fetching the network's predictions
-            loss += critertion(outputs, labels)
-            labeled0 = labels==0
-            labeled1 = labels==1
-            outputs0 = outputs==0
-            outputs1 = outputs==1
-            count += len(labels)
-            count0 += len(labeled0)
-            count1 += len(labeled1)
-            sens += sum(outputs1==labeled1)
-            spec += sum(labeled0==outputs0)
 
-    return (loss/count) , (sens/count1) , (spec/count0)
+            # For computing the loss, we want the real network output
+            loss += critertion(outputs, labels)
+
+            # For computing specificity and sensitivity, we want to round the labels to their integer values
+            outputs = outputs.round()
+
+            labeled0 = (labels==0)
+            labeled1 = (labels==1)
+            outputs0 = (outputs==0)
+            outputs1 = (outputs==1)
+            num_of_ones += sum(outputs1)
+            num_of_zeros += sum(outputs0)
+            count += len(labels)
+            count0 += sum(labeled0)
+            count1 += sum(labeled1)
+            tmp1 = outputs1*labeled1
+            tmp0 = labeled0*outputs0
+            sens += sum(tmp1)
+            spec += sum(tmp0)
+
+    print('There were', count0, 'zeros and', count1, 'ones')
+    print('Guessed', num_of_zeros, 'zeros and', num_of_ones, 'ones')
+
+    a = (loss/count)
+    b = (100*sens/count1)
+    c = (100*spec/count0)
+
+    return a, b, c
 
 
 def main(PREP_PATH):
@@ -128,7 +147,7 @@ def main(PREP_PATH):
     # Hyper parameters
     BATCH_SIZE = 500
     LEARNING_RATE = 0.001  # The optimal learning rate for the Adam optimizer
-    EPOCH_COUNT = 1
+    EPOCH_COUNT = 2
     DROPOUT_RATE = 0.1
 
     # Initialize train and validation datasets and loaders
@@ -140,8 +159,8 @@ def main(PREP_PATH):
     val_dataloader = torch.utils.data.DataLoader(val_dataset, batch_size=BATCH_SIZE)
 
     # Instantiate the net
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    net = Net(DROPOUT_RATE, DEBUG=False).to(device)
+    #device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    net = Net(DROPOUT_RATE, DEBUG=False)#.to(device)
 
     # Define loss
     critertion = nn.BCELoss()  # We shall use Binary Cross-Entropy Loss
@@ -150,13 +169,15 @@ def main(PREP_PATH):
     # Train the network
     train_loss = []
     val_loss = []
+    val_sens = []
+    val_spec = []
     for epoch in range(EPOCH_COUNT):
         running_loss = 0.0  # Defining a running loss that is initialized to 0 but will contain at the end of the batch the total loss of all the batch's samples
 
         for i, data in enumerate(train_dataloader, 0):
 
-            features = data['features'].to(device)
-            labels = data['label'].to(device)
+            features = data['features']#.to(device)
+            labels = data['label']#.to(device)
 
             optimizer.zero_grad()  # Initializing the gradients to zero
 
@@ -176,20 +197,22 @@ def main(PREP_PATH):
                 running_loss = 0.0
 
         # At the end of each epoch, remember the current train and validation loss
-        print('Computing total training loss, sensitivity and specificity...')
-        train_loss , train_sens , train_spec = compute_loss(net, train_dataloader)
-        #train_loss.append(train_loss)
+        print('Computing total training loss...')
+        new_loss, _, _ = compute_loss(net, train_dataloader)
+        train_loss.append(new_loss)
         print('Computing total validation loss, sensitivity and specificity...')
-        val_loss , val_sens , val_spec = compute_loss(net, val_dataloader)
-        #val_loss.append(val_sens)
+        new_loss, new_sens, new_spec = compute_loss(net, val_dataloader)
+        val_loss.append(new_loss)
+        val_sens.append(new_sens)
+        val_spec.append(new_spec)
 
         # GADI Please note this is the output model name and it is saved after every epoch. Be careful not to override files :)
-        torch.save(net.state_dict(), 'models/split_33_66_batchsize_' + str(BATCH_SIZE) + '_lr_' + str(LEARNING_RATE) + '_dropout_'+ str(DROPOUT_RATE) + '_epoch_' + str(epoch) +'.pkl')
+        torch.save(net.state_dict(), 'models/split_33_66_batchsize_' + str(BATCH_SIZE) + '_lr_' + str(LEARNING_RATE) + '_dropout_'+ str(DROPOUT_RATE) + '_epoch_' + str(epoch+1) +'.pkl')
 
     print('Final training losses are', train_loss)
     print('Final validation losses are', val_loss)
-    print('Final validation sesitivity is', val_sens)
-    print('Final validation specificity is', val_spec)
+    print('Final validation sesitivities are', val_sens)
+    print('Final validation specificities are', val_spec)
 
     # GADI Uncomment this if you want to test the test set too
     """
@@ -233,6 +256,6 @@ def main(PREP_PATH):
 
 
 if __name__ == '__main__':
-    main('Dataset/prep_biased_33_66/')
+    main('dataset/prep_biased_33_66/')
 
 
