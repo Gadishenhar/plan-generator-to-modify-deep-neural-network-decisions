@@ -133,11 +133,11 @@ def compute_loss(net, dataloader):
             spec += sum(tmp0)
 
     print('There were', count0, 'zeros and', count1, 'ones')
-    print('Guessed', num_of_zeros, 'zeros and', num_of_ones, 'ones')
+    print('Network guessed', num_of_zeros, 'zeros and', num_of_ones, 'ones')
 
     a = (loss/count)
-    b = (100*sens/count1)
-    c = (100*spec/count0)
+    b = (100*float(sens)/count1)
+    c = (100*float(spec)/count0)
 
     return a, b, c
 
@@ -147,7 +147,7 @@ def main(PREP_PATH):
     # Hyper parameters
     BATCH_SIZE = 500
     LEARNING_RATE = 0.001  # The optimal learning rate for the Adam optimizer
-    EPOCH_COUNT = 2
+    EPOCH_COUNT = 100
     DROPOUT_RATE = 0.1
 
     # Initialize train and validation datasets and loaders
@@ -191,7 +191,7 @@ def main(PREP_PATH):
 
             running_loss += loss.item()  # Summing the loss of each of this batch's samples into the total running loss
 
-            PRINT_FREQ = 100
+            PRINT_FREQ = 25
             if i % PRINT_FREQ == (PRINT_FREQ - 1):  # print every 20 mini-batches
                 print('[%d, %5d] loss: %.3f' % (epoch + 1, i + 1, running_loss / PRINT_FREQ))
                 running_loss = 0.0
@@ -200,18 +200,22 @@ def main(PREP_PATH):
         print('Computing total training loss...')
         new_loss, _, _ = compute_loss(net, train_dataloader)
         train_loss.append(new_loss)
+        print('Current training losses are', train_loss)
         print('Computing total validation loss, sensitivity and specificity...')
         new_loss, new_sens, new_spec = compute_loss(net, val_dataloader)
         val_loss.append(new_loss)
         val_sens.append(new_sens)
         val_spec.append(new_spec)
+        print('Current validation losses are', val_loss)
+        print('Current validation sensitivities are', val_sens)
+        print('Current validation specificities are', val_spec)
 
         # GADI Please note this is the output model name and it is saved after every epoch. Be careful not to override files :)
         torch.save(net.state_dict(), 'models/split_33_66_batchsize_' + str(BATCH_SIZE) + '_lr_' + str(LEARNING_RATE) + '_dropout_'+ str(DROPOUT_RATE) + '_epoch_' + str(epoch+1) +'.pkl')
 
     print('Final training losses are', train_loss)
     print('Final validation losses are', val_loss)
-    print('Final validation sesitivities are', val_sens)
+    print('Final validation sensitivities are', val_sens)
     print('Final validation specificities are', val_spec)
 
     # GADI Uncomment this if you want to test the test set too

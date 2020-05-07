@@ -2,7 +2,8 @@ import random
 import loanrequest
 import torch
 import pandas as pd
-import xlrd
+import math
+import statistics
 
 class Action:
     def __init__(self, action_id, action_name, action_value, cost_value, feature_number):
@@ -13,11 +14,11 @@ class Action:
         self.feature = feature_number
 
 actions = [
-    #Action('raise salary', 1.05, 7, 9),
-    Action(1,'raise credit score by factor 2', 2, 9, 9),
-    Action(2,'raise credit score by factor 4', 4, 9, 9)
+    Action(1,'raise credit score by factor 1.1', 1.1, 9, 9),
+    Action(2,'raise credit score by factor 1.2', 1.2, 9, 9)
 ]
 NUMBER_OF_ACTIONS = len(actions)
+MEAN_ACTION_COST = statistics.mean([action.cost for action in actions]) # List Comprehension - create a list of only the costs of all of the actions
 
 class Tree (object):
     """
@@ -42,7 +43,7 @@ class Tree (object):
         self.data = data
         self.total_cost = 0
         self.action = None
-        self.num_of_actions = 0
+        self.depth = 0
         self.num_of_successes = 0
         self.num_of_passes=0
     def createChildren(self,amount):
@@ -52,38 +53,122 @@ class Tree (object):
         for i in range(0,len(list)):
             self.data.append(list[i])
 
+def monte_carlo_tree_search(root):
+
+    ITERS_NUM = 10
+    for i in range(ITERS_NUM):
+
+        print('iteration', i)
+
+        # Selection stage
+        path_to_leaf = selection(root)
+        if len(path_to_leaf) > 1:
+            leaf = path_to_leaf[-1]
+        else:
+            leaf = path_to_leaf[0]
+
+        # Expansion Stage
+        next_child = expansion(leaf)
+
+        # Simulation Stage
+        total_cost, all_actions, is_successful = simulation(next_child)
+
+        # Back propogation
+        path_to_leaf.append(next_child)
+        backpropogation(path_to_leaf, is_successful)
 
 
-def Tree_Search(root):
+def selection(node):
 
-    #action_list = []
+    # If we reach a leaf, move on to expansion
+    if len(node.child) == 0:
+        return [node]
 
-    if root.num_of_actions==4:
-        return root.total_cost, [root.action], False
+
+    # Weight parameters
+    c = math.sqrt(2)
+    d = math.sqrt(2)
+    e = math.sqrt(2)
+
+    max_score = -math.inf
+    max_score_idx = -1
+    for i, child in enumerate(node.child):
+        score = child.num_of_successes / (child.num_of_passes + 1)
+        score += c * math.sqrt(math.log(node.num_of_passes + 1) / (child.num_of_passes + 1))
+        score -= d * child.total_cost / (MEAN_ACTION_COST * child.depth)
+        #score _-= e * something
+        if score > max_score:
+            max_score = score
+            max_score_idx = i
+
+    result = [node]
+    result.extend(selection(node.child[max_score_idx]))
+    return result
+
+
+def expansion(leaf):
+
+    # TODO Only adding 2 children means this node will never have more than two children, we miss possible routes.
+    if not len(leaf.child) == NUMBER_OF_ACTIONS:
+        # Create N new children
+        NUM_OF_CHILDREN = 2
+        added_children = 0
+        while added_children < NUM_OF_CHILDREN:
+
+            action = random.choice(actions)
+
+            does_exist = False
+            for c in leaf.child:
+                if c.action.action_id == action.action_id:
+                    does_exist = True
+
+            if not does_exist:
+                leaf.child.append(Tree(leaf.data))  # Add child to the current node
+                child = leaf.child[-1]
+                child.action = action
+                child.depth = root.depth + 1
+                child.total_cost += action.cost
+                child.data[child.action.feature] = child.action.action_value * child.data[child.action.feature]
+                added_children += 1
+
+    # Pick random child
+    return random.choice(leaf.child)
+
+
+def simulation(node):
+
+    if node.depth == 4:
+        return node.total_cost, [node.action], False
+
     #TODO - change the function's name after we export the loanrequest weights:
-    if net.forward(root.data)==0:
+    if net.forward(node.data) <= 0.5:
        print("Loan is approved given your current financial status")
-       return root.total_cost, [root.action], True
+       return node.total_cost, [node.action], True
 
     current_action = random.choice(actions)
-    #while (current_action.action_id in action_list):
-    #    current_action = random.choice(actions)
-    #action_list.append(current_action.action_id)
     print('Trying action:', current_action.action_name)
 
-    root.child.append(Tree(root.data))
-    child = root.child[-1]
+    node.child.append(Tree(node.data)) # Add child to the current node
+    child = node.child[-1]
     child.action = current_action
-    child.num_of_actions = root.num_of_actions+1
+    child.depth = root.depth + 1
     child.data[child.action.feature] = child.action.action_value * child.data[child.action.feature]
 
-    total_cost, all_actions, is_successful = Tree_Search(child) #Call this child's child, and save the cost, the list of actions and whether the rollout was successful
-    child.num_of_successes += int(is_successful) #num_of_successes contains the number of successful rollout coming out of this child
-    child.num_of_passes=child.num_of_passes+1 #The number of times we have passes through this child during the run
-
+    total_cost, all_actions, is_successful = simulation(child) #Call this child's child, and save the cost, the list of actions and whether the rollout was successful
     all_actions.append(current_action)
     child.total_cost = total_cost #Summing the cost of this child and its subtrees
     return total_cost + current_action.cost, all_actions, is_successful
+
+def backpropogation(nodes, is_successful):
+    if nodes == None:
+        return
+    for node in nodes:
+        node.num_of_passes += 1
+        node.num_of_successes += int(is_successful)
+        print(node.num_of_passes)
+
+
+
 
 df = pd.read_csv('dataset\montecarlo_trial.csv')
 
@@ -94,4 +179,4 @@ root = Tree(features_tensor)
 net = loanrequest.Net(DROPOUT_RATE=0.1)
 net.load_state_dict(torch.load('models\split_33_66_batchsize_500_lr_0.001_dropout_0.1_epoch_1.pkl', map_location='cpu'))
 
-Tree_Search(root)
+monte_carlo_tree_search(root)

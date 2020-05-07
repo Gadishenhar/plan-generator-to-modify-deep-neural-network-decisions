@@ -1,9 +1,3 @@
 *.txt
-.idea/plan-generator-to-modify-deep-neural-network-decisions.iml
-.idea/plan-generator-to-modify-deep-neural-network-decisions.iml
-.idea/plan-generator-to-modify-deep-neural-network-decisions.iml
-.idea/plan-generator-to-modify-deep-neural-network-decisions.iml
-*.iml
-.idea/misc.xml
-.idea/plan-generator-to-modify-deep-neural-network-decisions.iml
-.idea/workspace.xml
+.idea/*
+venv/*
