@@ -5,8 +5,8 @@ import pandas as pd
 import math
 import statistics
 
-OPTIONS_PER_FEATURE = 10 #the number of different actions we want to allow for each of the features
-NUMBER_OF_FEATURES = 21
+OPTIONS_PER_FEATURE = 9 #the number of different actions we want to allow for each of the features
+NUMBER_OF_FEATURES = 21 #Number of given features
 
 class Action:
     def __init__(self, action_id, action_name, action_value, cost_value, feature_number):
@@ -16,16 +16,15 @@ class Action:
         self.cost = cost_value
         self.feature = feature_number
 
-for i in range(NUMBER_OF_FEATURES):
-    for j in range(OPTIONS_PER_FEATURE):
-        TempAction = Action(str(i)+str(j),str('multiply feature ')+int(i)+str('by')+float(1+0.01*j) , float(1+0.01*j), j, i)
+actions = [] ##Initializing an empty list which will contain all the actions
+for i in range(1,NUMBER_OF_FEATURES):
+    for j in range(1, OPTIONS_PER_FEATURE):
+        action_value=1+0.01*j
+        TempAction = Action(str(i)+str(j),str('multiply feature ')+str(i)+str(' by ')+str(action_value), action_value, j, i)
+        print("action number ", TempAction.action_id, ": ", TempAction.action_name,", cost:", TempAction.cost)
         actions.append(TempAction)
 
-print(actions)
-#actions = [
-#    Action(1,'raise credit score by factor 1.1', 1.1, 9, 9),
-#    Action(2,'raise credit score by factor 1.2', 1.2, 9, 9)
-#]
+
 NUMBER_OF_ACTIONS = len(actions)
 MEAN_ACTION_COST = statistics.mean([action.cost for action in actions]) # List Comprehension - create a list of only the costs of all of the actions
 
@@ -151,7 +150,7 @@ def simulation(node):
 
     #TODO - change the function's name after we export the loanrequest weights:
     if net.forward(node.data) <= 0.5:
-       print("Loan is approved given your current financial status")
+       print("Successful path")
        return node.total_cost, [node.action], True
 
     current_action = random.choice(actions)
