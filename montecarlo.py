@@ -5,6 +5,9 @@ import pandas as pd
 import math
 import statistics
 
+OPTIONS_PER_FEATURE = 10 #the number of different actions we want to allow for each of the features
+NUMBER_OF_FEATURES = 21
+
 class Action:
     def __init__(self, action_id, action_name, action_value, cost_value, feature_number):
         self.action_id = action_id
@@ -13,10 +16,16 @@ class Action:
         self.cost = cost_value
         self.feature = feature_number
 
-actions = [
-    Action(1,'raise credit score by factor 1.1', 1.1, 9, 9),
-    Action(2,'raise credit score by factor 1.2', 1.2, 9, 9)
-]
+for i in range(NUMBER_OF_FEATURES):
+    for j in range(OPTIONS_PER_FEATURE):
+        TempAction = Action(str(i)+str(j),str('multiply feature ')+int(i)+str('by')+float(1+0.01*j) , float(1+0.01*j), j, i)
+        actions.append(TempAction)
+
+print(actions)
+#actions = [
+#    Action(1,'raise credit score by factor 1.1', 1.1, 9, 9),
+#    Action(2,'raise credit score by factor 1.2', 1.2, 9, 9)
+#]
 NUMBER_OF_ACTIONS = len(actions)
 MEAN_ACTION_COST = statistics.mean([action.cost for action in actions]) # List Comprehension - create a list of only the costs of all of the actions
 
