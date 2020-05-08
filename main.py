@@ -16,7 +16,7 @@ class Dataset(torch.utils.data.Dataset): #Defining the dataset
         if torch.is_tensor(idx):
             idx = idx.tolist()  # We prefer working with lists rather than tensors at this stage, so if we find a tensor - turn it into a list
         feature = self.df.iloc[idx,:-1]  # Our features are all the columns except the last one: "default" - whether the client payed all their payements on time
-        label = self.df.iloc[idx, -1]  # Our label is the last column: "default" - whether the client payed all their payements on time. 0 is yes, 1 is no.
+        label = self.df.iloc[idx, -1]  # Our label is the last column: "default" - whether the client payed all their payements on time. 0 is yes, 1 is no....
         sample = {'features': torch.tensor(feature), 'label': torch.tensor(label)}  # We represent our data as 'samples' which are two seperate tensors - one for features and one for the labels
         return sample
 
@@ -261,5 +261,3 @@ def main(PREP_PATH):
 
 if __name__ == '__main__':
     main('dataset/prep_biased_33_66/')
-
-
