@@ -147,7 +147,7 @@ def main(PREP_PATH):
     # Hyper parameters
     BATCH_SIZE = 500
     LEARNING_RATE = 0.001  # The optimal learning rate for the Adam optimizer
-    EPOCH_COUNT = 1
+    EPOCH_COUNT = 10
     DROPOUT_RATE = 0.1
 
     # Initialize train and validation datasets and loaders
