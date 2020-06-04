@@ -3,6 +3,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.utils.data
+from datetime import datetime
 
 class Dataset(torch.utils.data.Dataset): #Defining the dataset
 
@@ -17,7 +18,7 @@ class Dataset(torch.utils.data.Dataset): #Defining the dataset
             idx = idx.tolist()  # We prefer working with lists rather than tensors at this stage, so if we find a tensor - turn it into a list
         feature = self.df.iloc[idx,:-1]  # Our features are all the columns except the last one: "default" - whether the client payed all their payements on time
         label = self.df.iloc[idx, -1]  # Our label is the last column: "default" - whether the client payed all their payements on time. 0 is yes, 1 is no....
-        sample = {'features': torch.tensor(feature), 'label': torch.tensor(label)}  # We represent our data as 'samples' which are two seperate tensors - one for features and one for the labels
+        sample = {'features': torch.tensor(feature).float(), 'label': torch.tensor(label).float()}  # We represent our data as 'samples' which are two seperate tensors - one for features and one for the labels
         return sample
 
 
@@ -29,11 +30,19 @@ class Net(nn.Module):
         self.DEBUG = DEBUG
 
         self.INPUT_NEURONS = 21  # The input neurons are in the amount of our features
-        self.NEURONS_PER_LAYER = 200  # We decided to use 200 output neurons as they did in Polaris
+        # We chose to increase the size of each layer by 1.5-2 of the previous layer
+        self.SIZE_HIDDEN_LAYER_1 = 42
+        self.SIZE_HIDDEN_LAYER_2 = 64
+        self.SIZE_HIDDEN_LAYER_3 = 128
+        self.SIZE_HIDDEN_LAYER_4 = 256
+        self.SIZE_OUTPUT_LAYER = 512
 
-        self.input_layer = nn.Linear(self.INPUT_NEURONS, self.NEURONS_PER_LAYER)  # the first layer is linear
-        self.hidden_layer = nn.Linear(self.NEURONS_PER_LAYER, self.NEURONS_PER_LAYER)  # the middle layers are linear
-        self.output_layer = nn.Linear(self.NEURONS_PER_LAYER, 1)  # the last layer in linear
+        self.input_layer = nn.Linear(self.INPUT_NEURONS, self.SIZE_HIDDEN_LAYER_1)
+        self.hidden_layer1 = nn.Linear(self.SIZE_HIDDEN_LAYER_1, self.SIZE_HIDDEN_LAYER_2)
+        self.hidden_layer2 = nn.Linear(self.SIZE_HIDDEN_LAYER_2, self.SIZE_HIDDEN_LAYER_3)
+        self.hidden_layer3 = nn.Linear(self.SIZE_HIDDEN_LAYER_3, self.SIZE_HIDDEN_LAYER_4)
+        self.hidden_layer4 = nn.Linear(self.SIZE_HIDDEN_LAYER_4, self.SIZE_OUTPUT_LAYER)
+        self.output_layer = nn.Linear(self.SIZE_OUTPUT_LAYER, 1)
 
         self.relu = nn.ReLU()
         self.dropout = nn.Dropout(DROPOUT_RATE)
@@ -44,7 +53,7 @@ class Net(nn.Module):
         if self.DEBUG:
             print('Input features:')
             print(x)
-
+        #x = x.float()
         x = self.input_layer(x)
         x = self.dropout(x)
         x = self.relu(x)
@@ -53,7 +62,7 @@ class Net(nn.Module):
             print('After input layer:')
             print(x)
 
-        x = self.hidden_layer(x)
+        x = self.hidden_layer1(x)
         x = self.dropout(x)
         x = self.relu(x)
 
@@ -61,7 +70,7 @@ class Net(nn.Module):
             print('After second layer:')
             print(x)
 
-        x = self.hidden_layer(x)
+        x = self.hidden_layer2(x)
         x = self.dropout(x)
         x = self.relu(x)
 
@@ -69,7 +78,7 @@ class Net(nn.Module):
             print('After third layer:')
             print(x)
 
-        x = self.hidden_layer(x)
+        x = self.hidden_layer3(x)
         x = self.dropout(x)
         x = self.relu(x)
 
@@ -77,11 +86,13 @@ class Net(nn.Module):
             print('After dourth layer:')
             print(x)
 
-        x = self.output_layer(x)
+        x = self.hidden_layer4(x)
 
         if self.DEBUG:
             print('After output layer:')
             print(x)
+
+        x = self.output_layer(x)
 
         x = self.sigmoid(x)
 
@@ -144,10 +155,11 @@ def compute_loss(net, dataloader):
 
 def main(PREP_PATH):
 
+    print('First timestep', datetime.now())
     # Hyper parameters
-    BATCH_SIZE = 500
+    BATCH_SIZE = 30
     LEARNING_RATE = 0.001  # The optimal learning rate for the Adam optimizer
-    EPOCH_COUNT = 1
+    EPOCH_COUNT = 10
     DROPOUT_RATE = 0.1
 
     # Initialize train and validation datasets and loaders
@@ -217,6 +229,7 @@ def main(PREP_PATH):
     print('Final validation losses are', val_loss)
     print('Final validation sensitivities are', val_sens)
     print('Final validation specificities are', val_spec)
+    print('Second timestep', datetime.now())
 
     # GADI Uncomment this if you want to test the test set too
     """

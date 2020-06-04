@@ -5,11 +5,13 @@ import pandas as pd
 import math
 import statistics
 import copy
+import numpy as np
+from datetime import datetime
 
 OPTIONS_PER_FEATURE = 9 #the number of different actions we want to allow for each of the features
 NUMBER_OF_FEATURES = 21 #Number of given features
-MAX_DEPTH = 10 #The maximal depth of our tree
-THRESHOLD = 0.01
+MAX_DEPTH = 100 #The maximal depth of our tree
+THRESHOLD = 0.8
 
 class Action:
     def __init__(self, action_id, action_name, action_value, cost_value, feature_number):
@@ -18,18 +20,6 @@ class Action:
         self.action_value = action_value
         self.cost = cost_value
         self.feature = feature_number
-
-actions = [] ##Initializing an empty list which will contain all the actions
-for i in range(1,NUMBER_OF_FEATURES):
-    for j in range(1, OPTIONS_PER_FEATURE):
-        action_value=1+0.01*j
-        TempAction = Action(str(i)+str(j),str('multiply feature ')+str(i)+str(' by ')+str(action_value), action_value, j, i)
-        #print("action number ", TempAction.action_id, ": ", TempAction.action_name,", cost:", TempAction.cost)
-        actions.append(TempAction)
-
-
-NUMBER_OF_ACTIONS = len(actions)
-MEAN_ACTION_COST = statistics.mean([action.cost for action in actions]) # List Comprehension - create a list of only the costs of all of the actions
 
 class Tree (object):
     """
@@ -115,17 +105,18 @@ def selection(node):
 
 
     # Weight parameters
-    c = math.sqrt(2)
-    d = math.sqrt(2)
-    e = math.sqrt(2)
+    A = 1
+    B = math.sqrt(2)
+    C = math.sqrt(2)
+    D = math.sqrt(2)
 
     max_score = -math.inf
     max_score_idx = -1
     for i, child in enumerate(node.child):
-        score = child.num_of_successes / (child.num_of_passes + 1)
-        score += c * math.sqrt(math.log(node.num_of_passes + 1) / (child.num_of_passes + 1))
-        score -= d * child.total_cost / (MEAN_ACTION_COST * child.depth)
-        #score _-= e * something
+        score = A * child.num_of_successes / (child.num_of_passes + 1)
+        score += B * math.sqrt(math.log(node.num_of_passes + 1) / (child.num_of_passes + 1))
+        score -= C * child.total_cost / (MEAN_ACTION_COST * child.depth)
+        score -= D * child.depth
         if score > max_score:
             max_score = score
             max_score_idx = i
@@ -171,7 +162,9 @@ def simulation(node):
         return node.total_cost, [node.action], False
 
     #TODO - change the function's name after we export the loanrequest weights:
+
     net_out = float(net.forward((node.data)))
+
     print(net_out)
     if net_out <= THRESHOLD:
        print("Successful path!")
@@ -211,15 +204,16 @@ def best_route(node):
         return temp
 
     list_of_actions = []
-    a = b = c = math.sqrt(2)
+    A = 1
+    C = D = math.sqrt(2)
     max_score = -math.inf
     max_score_idx = 1.5
     for i, child in enumerate(node.child):
         if child.num_of_successes==0:
             continue
-        score = a * child.num_of_successes / (child.num_of_passes + 1)
-        score -= b * child.total_cost / (MEAN_ACTION_COST * child.depth)
-        score -= c * child.depth
+        score = A * child.num_of_successes / (child.num_of_passes + 1)
+        score -= C * child.total_cost / (MEAN_ACTION_COST * child.depth)
+        score -= D * child.depth
         if score > max_score:
             max_score = score
             max_score_idx = i
@@ -231,7 +225,88 @@ def best_route(node):
     list_of_actions.append(node.action.action_name)
     return list_of_actions
 
+def generate_actions (feature,values,curr_value, is_discrete):
+    actions = []
+    for i in values:
+        if is_discrete:
+            action_value = i / curr_value.iloc[0,feature]
+            if i == curr_value.iloc[0,feature]:
+                continue
+        else:
+            action_value = i
+        curr_cost = (abs(action_value * curr_value.iloc[0,feature] - stats_mean.iloc[feature+1])) / stats_std.iloc[feature+1]
+        TempAction = Action(str(feature) + str(i),
+                            str('multiply feature ') + str(feature) + str(' by ') + str(action_value),
+                            action_value, curr_cost, feature)
+        actions.append(TempAction)
+    return actions
+
 df = pd.read_csv('dataset\montecarlo_trial.csv')
+
+#Load the statistics about the data
+stats = pd.read_csv('dataset\statistics.csv')
+stats_mean = stats.iloc[1]
+stats_std = stats.iloc[2]
+
+"""
+actions = [] #Initializing an empty list which will contain all the actions
+for i in range(1,NUMBER_OF_FEATURES): #i represent the feature which we shift
+    if (i==2):
+        if (df.iloc[0, i]==0):
+            for bank in range(1, 17):
+                action_value = bank
+                ##TODO - consider the meaning of cost in this case
+                curr_cost = (abs(action_value * df.iloc[0, i] - stats_mean.iloc[i])) / stats_std.iloc[i]
+                TempAction = Action(str(i) + str(bank),
+                                    str('multiply feature ') + str(i) + str(' by ') + str(action_value),
+                                    action_value, curr_cost, i)
+                actions.append(TempAction)
+            continue
+        for bank in range(1,17):
+            action_value = bank/df.iloc[0, i]
+            ##TODO - consider the meaning of cost in this case
+            curr_cost = (abs(action_value * df.iloc[0, i] - stats_mean.iloc[i])) / stats_std.iloc[i]
+            TempAction = Action(str(i) + str(bank), str('multiply feature ') + str(i) + str(' by ') + str(action_value),
+                                action_value, curr_cost, i)
+            actions.append(TempAction)
+        continue
+    if (i==8):
+        for Borr in range(1,4):
+            action_value = 1 + Borr
+            curr_cost = (abs(action_value * df.iloc[0, i] - stats_mean.iloc[i])) / stats_std.iloc[i]
+            TempAction = Action(str(i) + str(Borr), str('multiply feature ') + str(i) + str(' by ') + str(action_value),
+                                action_value, curr_cost, i)
+            actions.append(TempAction)
+        continue
+    for j in range(1, OPTIONS_PER_FEATURE): #j represent the percentage in which is shift the feature
+        action_value=1+0.01*j
+        curr_cost = ( abs(action_value*df.iloc[0,i]-stats_mean.iloc[i]) ) / stats_std.iloc[i]
+        TempAction = Action(str(i)+str(j),str('multiply feature ')+str(i)+str(' by ')+str(action_value), action_value, curr_cost, i)
+        actions.append(TempAction)
+"""
+
+actions = [] ##Initializing an empty list of actions
+#Generating actions for each feature:
+actions.extend(generate_actions(0,[1,2,3],df,True))  # Origination channel
+actions.extend(generate_actions(1,list(range(1,97)),df,True))  # Seller name
+actions.extend(generate_actions(4,list(np.arange(999,500,-1)/1000),df,False)) # UPB - Decrease by up to 50%
+actions.extend(generate_actions(5,list(np.arange(999,500,-1)/1000),df,False)) # LTV - Decrease by up to 50%
+actions.extend(generate_actions(6,list(np.arange(999,500,-1)/1000),df,False))  # CLTV
+actions.extend(generate_actions(7,[1,2,3],df,True)) ##Number of borrowers
+actions.extend(generate_actions(8,list(np.arange(999,500,-1)/1000),df,False))  # Debt to income
+actions.extend(generate_actions(9,list(np.arange(1001,1500)/1000),df,False))  # Credit Score
+actions.extend(generate_actions(10,[1,2],df,True)) #First time home buyer
+actions.extend(generate_actions(11,list(range(1,4)),df,True)) #LOAN PURPOSE
+#actions.extend(generate_actions(0,list(range(1,6)),df,True)) #Property type
+actions.extend(generate_actions(12,list(range(1,5)),df,True)) # Number of units
+actions.extend(generate_actions(13,list(range(1,4)),df,True)) # Occupancy Type
+actions.extend(generate_actions(16,list(np.arange(1001,1500)/1000),df,False))  # PRIMARY MORTGAGE INSURANCE PERCENT
+actions.extend(generate_actions(18,list(np.arange(1001,1500)/1000),df,False))  # CoBorrower Credit Score
+actions.extend(generate_actions(19,list(range(1,4)),df,True)) #MORTGAGE INSURANCE TYPE
+actions.extend(generate_actions(20,list(range(1,3)),df,True)) #RELOCATION MORTGAGE INDICATOR
+
+NUMBER_OF_ACTIONS = len(actions)
+MEAN_ACTION_COST = statistics.mean([action.cost for action in actions]) # List Comprehension - create a list of only the costs of all of the actions
 
 features_np_array = (df.iloc[0, :-1]).astype(float).to_numpy()
 features_tensor = torch.from_numpy(features_np_array).type(torch.FloatTensor)

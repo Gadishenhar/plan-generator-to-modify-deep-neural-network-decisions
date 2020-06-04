@@ -99,24 +99,24 @@ def prep_columns(df, seller_names, property_states):
 
     # Column 13 - FIRST TIME HOME BUYER INDICATOR
     print_useful_info(df.iloc[:, 13], 13)
-    df.iloc[:, 13].replace('N', 0, inplace=True)
-    df.iloc[:, 13].replace('Y', 1, inplace=True)
-    df.iloc[:, 13].replace('U', 2, inplace=True)
+    df.iloc[:, 13].replace('N', 1, inplace=True)
+    df.iloc[:, 13].replace('Y', 2, inplace=True)
+    df.iloc[:, 13].replace('U', 3, inplace=True)
 
     # Column 14 - LOAN PURPOSE
     print_useful_info(df.iloc[:, 14], 14)
-    df.iloc[:, 14].replace('P', 0, inplace=True)
-    df.iloc[:, 14].replace('C', 1, inplace=True)
-    df.iloc[:, 14].replace('R', 2, inplace=True)
-    df.iloc[:, 14].replace('U', 3, inplace=True)
+    df.iloc[:, 14].replace('P', 1, inplace=True)
+    df.iloc[:, 14].replace('C', 2, inplace=True)
+    df.iloc[:, 14].replace('R', 3, inplace=True)
+    df.iloc[:, 14].replace('U', 4, inplace=True)
 
     # Column 15 - PROPERTY TYPE
     print_useful_info(df.iloc[:, 15], 15)
-    df.iloc[:, 15].replace('SF', 0, inplace=True)
-    df.iloc[:, 15].replace('PU', 1, inplace=True)
-    df.iloc[:, 15].replace('CO', 2, inplace=True)
-    df.iloc[:, 15].replace('MH', 3, inplace=True)
-    df.iloc[:, 15].replace('CP', 4, inplace=True)
+    df.iloc[:, 15].replace('SF', 1, inplace=True)
+    df.iloc[:, 15].replace('PU', 2, inplace=True)
+    df.iloc[:, 15].replace('CO', 3, inplace=True)
+    df.iloc[:, 15].replace('MH', 4, inplace=True)
+    df.iloc[:, 15].replace('CP', 5, inplace=True)
 
     # TODO Consider if keeping this column is beneficial or hurts us
     # Column 16 - NUMBER OF UNITS
@@ -125,10 +125,10 @@ def prep_columns(df, seller_names, property_states):
 
     # Column 17 - OCCUPANCY TYPE
     print_useful_info(df.iloc[:, 17], 17)
-    df.iloc[:, 17].replace('P', 0, inplace=True)
-    df.iloc[:, 17].replace('I', 1, inplace=True)
-    df.iloc[:, 17].replace('S', 2, inplace=True)
-    df.iloc[:, 17].replace('U', 3, inplace=True)
+    df.iloc[:, 17].replace('P', 1, inplace=True)
+    df.iloc[:, 17].replace('I', 2, inplace=True)
+    df.iloc[:, 17].replace('S', 3, inplace=True)
+    df.iloc[:, 17].replace('U', 4, inplace=True)
 
     # Column 18 - PROPERTY STATE
     # TODO Also sort by how common the values are?
@@ -166,8 +166,8 @@ def prep_columns(df, seller_names, property_states):
 
     # Column 24 - RELOCATION MORTGAGE INDICATOR
     print_useful_info(df.iloc[:, 24], 24)
-    df.iloc[:, 24].replace('N', 0, inplace=True)
-    df.iloc[:, 24].replace('Y', 1, inplace=True)
+    df.iloc[:, 24].replace('N', 1, inplace=True)
+    df.iloc[:, 24].replace('Y', 2, inplace=True)
 
     # Drop any leftover entires that contains NaNs (should be a single entry, due to a single NaN in column 9)
     df.dropna(inplace=True)
