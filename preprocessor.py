@@ -274,15 +274,14 @@ def bias_labels(df, zeros_to_ones_ratio):
     return df
 
 
-
 def main(acq_path, per_path, out_path, TRAIN_VAL_TEST_SPLIT):
 
     """
     # Iteration 1: go over all of the acquisition files, and merge them with the appropriate performance data
     # If the merged data set files already exist, we can skip this step
-    force_iter_1 = False
+    force_iter_1 = True
     if (not os.path.isfile(out_path + 'AcqPer_2018Q4.txt')) or force_iter_1:
-        for year in range(2000, 2018+1):
+        for year in range(2001, 2018+1):
             for quarter in range(1, 4+1):
                 suffix = str(year) + 'Q' + str(quarter) + '.txt'
                 acquisition_file_name = acq_path + 'Acquisition_' + suffix
@@ -293,12 +292,12 @@ def main(acq_path, per_path, out_path, TRAIN_VAL_TEST_SPLIT):
 
     # Iteration 2: go over all of the merged data sets and extract from them all of the unique values from the seller
     # name and property state columns
-    force_skip_iter_2 = True
+    force_skip_iter_2 = False
     if not force_skip_iter_2:
         print('Extracting unique sellers and property states...')
         seller_names = set()
         property_states = set()
-        for year in range(2000, 2018+1):
+        for year in range(2001, 2018+1):
             for quarter in range(1, 4+1):
                 suffix = str(year) + 'Q' + str(quarter) + '.txt'
                 file_name = out_path + 'AcqPer_' + suffix
@@ -310,12 +309,16 @@ def main(acq_path, per_path, out_path, TRAIN_VAL_TEST_SPLIT):
         seller_names = list(seller_names)
         property_states = list(property_states)
 
+    # Save the final lists (this was after running previous section
+    seller_names = ['WELLS FARGO BANK,  NA', 'AMERIHOME MORTGAGE COMPANY, LLC', 'METLIFE HOME LOANS LLC', 'SANTANDER BANK, NATIONAL ASSOCIATION', 'PACIFIC UNION FINANCIAL, LLC', 'CASHCALL, INC.', 'PULTE MORTGAGE, L.L.C.', 'CMG MORTGAGE, INC', 'GMAC MORTGAGE, LLC', 'CAPITAL ONE, NATIONAL ASSOCIATION', 'USAA FEDERAL SAVINGS BANK', 'FIRST BANK DBA FIRST BANK MORTGAGE', 'LAKEVIEW LOAN SERVICING, LLC', 'FLAGSTAR BANK, FSB', 'PMT CREDIT RISK TRANSFER TRUST 2015-2', 'FDIC, RECEIVER, INDYMAC FEDERAL BANK FSB', 'CITIMORTGAGE, INC.', 'SUNTRUST MORTGAGE INC.', 'REGIONS BANK', 'HSBC BANK USA, NATIONAL ASSOCIATION', 'STONEGATE MORTGAGE CORPORATION', 'PMTT4', 'TRUIST BANK (FORMERLY SUNTRUST BANK)', 'CHICAGO MORTGAGE SOLUTIONS DBA INTERBANK MORTGAGE COMPANY', 'RBC MORTGAGE COMPANY', 'NYCB MORTGAGE COMPANY, LLC', 'FRANKLIN AMERICAN MORTGAGE COMPANY', 'THE BRANCH BANKING AND TRUST COMPANY', 'UNITED SHORE FINANCIAL SERVICES, LLC D/B/A UNITED WHOLESALE MORTGAGE', 'HOMEWARD RESIDENTIAL, INC.', 'NETBANK FUNDING SERVICES', 'COLORADO FEDERAL SAVINGS BANK', 'FREMONT BANK', 'PHH MORTGAGE CORPORATION (USAA FEDERAL SAVINGS BANK)', 'HOMEBRIDGE FINANCIAL SERVICES, INC.', 'SIERRA PACIFIC MORTGAGE COMPANY, INC.', 'FEDERAL HOME LOAN BANK OF CHICAGO', 'PROSPECT MORTGAGE, LLC', 'ASSOCIATED BANK, NA', 'PMT CREDIT RISK TRANSFER TRUST 2016-1', 'JPMORGAN CHASE BANK, NATIONAL ASSOCIATION', 'AMTRUST BANK', 'JPMORGAN CHASE BANK, NA', 'PRINCIPAL RESIDENTIAL MORTGAGE CAPITAL RESOURCES, LLC', 'GMAC MORTGAGE, LLC (USAA FEDERAL SAVINGS BANK)', 'U.S. BANK N.A.', 'BISHOPS GATE RESIDENTIAL MORTGAGE TRUST', 'GUILD MORTGAGE COMPANY', 'OTHER', 'EAGLE HOME MORTGAGE, LLC', 'WELLS FARGO CREDIT RISK TRANSFER SECURITIES TRUST 2015', 'EVERBANK', 'FAIRWAY INDEPENDENT MORTGAGE CORPORATION', 'ROUNDPOINT MORTGAGE COMPANY', 'THIRD FEDERAL SAVINGS AND LOAN', 'SUNTRUST BANK', 'NATIONSTAR MORTGAGE, LLC', 'PNC BANK, N.A.', 'METLIFE BANK, NA', 'J.P. MORGAN MADISON AVENUE SECURITIES TRUST, SERIES 2015-1', 'FLAGSTAR CAPITAL MARKETS CORPORATION', 'IMPAC MORTGAGE CORP.', 'UNITED SHORE FINANCIAL SERVICES, LLC DBA UNITED WHOLESALE MORTGAGE', 'LOANDEPOT.COM, LLC', 'ALLY BANK', 'QUICKEN LOANS INC.', 'THE HUNTINGTON NATIONAL BANK', 'CHICAGO MORTGAGE SOLUTIONS DBA INTERFIRST MORTGAGE COMPANY', 'WELLS FARGO BANK, N.A.', 'J.P. MORGAN MADISON AVENUE SECURITIES TRUST, SERIES 2014-1', 'DITECH FINANCIAL LLC', 'BANK OF AMERICA, N.A.', 'CHASE HOME FINANCE, LLC', 'CHASE HOME FINANCE', 'CHASE HOME FINANCE (CIE 1)', 'AMERISAVE MORTGAGE CORPORATION', 'MOVEMENT MORTGAGE, LLC', 'FIRST TENNESSEE BANK NATIONAL ASSOCIATION', 'FINANCE OF AMERICA MORTGAGE LLC', 'PENNYMAC CORP.', 'CHASE HOME FINANCE FRANKLIN AMERICAN MORTGAGE COMPANY', 'WITMER FUNDING, LLC', 'JP MORGAN CHASE BANK, NA', 'IRWIN MORTGAGE, CORPORATION', 'USAA DIRECT DELIVERY', 'CALIBER HOME LOANS, INC.', 'DOWNEY SAVINGS AND LOAN ASSOCIATION, F.A.', 'FLEET NATIONAL BANK', 'FREEDOM MORTGAGE CORP.', 'STEARNS LENDING, LLC', 'HARWOOD STREET FUNDING I, LLC', 'CITIZENS BANK, NATIONAL ASSOCIATION', 'NEW YORK COMMUNITY BANK', 'PHH MORTGAGE CORPORATION', 'FIFTH THIRD BANK', 'PROVIDENT FUNDING ASSOCIATES, L.P.']
+    property_states = ['MA', 'GA', 'MS', 'IN', 'WI', 'KS', 'AK', 'IL', 'NH', 'PA', 'HI', 'NM', 'NE', 'IA', 'AL', 'CT', 'TN', 'ID', 'NJ', 'ME', 'MI', 'UT', 'GU', 'ND', 'AZ', 'RI', 'OK', 'NY', 'MN', 'VA', 'AR', 'NC', 'SD', 'DE', 'VT', 'SC', 'TX', 'CA', 'WA', 'CO', 'OR', 'WY', 'MT', 'FL', 'MO', 'DC', 'PR', 'WV', 'VI', 'LA', 'MD', 'NV', 'KY', 'OH']
+
     # Iteration 3: go over each data set file, replace all string values with numerical values, fill missing entries,
     # drop any remaining NaNs and remove some columns. Data is NOT normalized yet.
     # If the tokenized data set files already exist, we can skip this step
-    force_iter_3 = False
+    force_iter_3 = True
     if (not os.path.isfile(out_path + 'TokAcqPer_2018Q4.txt')) or force_iter_3:
-        for year in range(2000, 2018+1):
+        for year in range(2001, 2018+1):
             for quarter in range(1, 4+1):
                 suffix = str(year) + 'Q' + str(quarter) + '.txt'
                 file_name = out_path + 'AcqPer_' + suffix
@@ -323,15 +326,18 @@ def main(acq_path, per_path, out_path, TRAIN_VAL_TEST_SPLIT):
                 df = pd.read_csv(file_name, names=COL_NAMES)
                 prep_columns(df, seller_names, property_states).to_csv(out_path + 'TokAcqPer_' + suffix, index=False, header=False)
 
+
+
     # The next step must be done manually (for now) outside of python:
-    # * merge all of the text files to one
-    # * save the result of df.describe() to stats.txt
+    # * merge all of the text files to one (in cmd: copy TokAcqPer* TokMerged.txt)
+    # * save the result of df.describe() to stats.txt (in cmd: df.describe().to_csv('stats.txt')
     # TODO Write code for it here
+
 
     # Iter 4: Even though we have a single tokenized file, we need to normalize each quarter separately.
     if os.path.isfile(out_path + 'stats.txt') and (not os.path.isfile(out_path + 'NormTokAcqPer_2018Q4.txt')):
         stats_df = pd.read_csv(out_path + 'stats.txt')
-        for year in range(2000, 2018+1):
+        for year in range(2001, 2018+1):
             for quarter in range(1, 4+1):
                 suffix = str(year) + 'Q' + str(quarter) + '.txt'
                 file_name = out_path + 'TokAcqPer_' + suffix
@@ -349,7 +355,7 @@ def main(acq_path, per_path, out_path, TRAIN_VAL_TEST_SPLIT):
     # Iter 5: Next, we need to go over each normalized tokenized data set file, and split it to a train file, a
     # validation file and a test file, using the given split.
     if os.path.isfile(out_path + 'NormTokAcqPer_2018Q4.txt'):
-        for year in range(2000, 2018+1):
+        for year in range(2001, 2018+1):
             for quarter in range(1, 4+1):
                 suffix = str(year) + 'Q' + str(quarter) + '.txt'
                 file_name = out_path + 'NormTokAcqPer_' + suffix
@@ -364,12 +370,17 @@ def main(acq_path, per_path, out_path, TRAIN_VAL_TEST_SPLIT):
 
     # The next step must be done manually (for now) outside of python:
     # * merge all of the new files to three (train, val and test)
+    # copy train2* train.txt
+    # copy val2* val.txt
+    # copy test2* test.txt
     # TODO Write code for it here
 
+
     # Next, we open the train, val and test files and bias the labels
+
     # First time, a 10%, 90% bias
     print('Biasing train with 1-9 ratio...')
-    df = pd.read_csv(OUT_PATH + 'mergedTrain.txt')
+    df = pd.read_csv(OUT_PATH + 'train.txt')
     ZEROS_LEN = len(df[df.iloc[:, -1] == 0])
     ONES_LEN = len(df[df.iloc[:, -1] == 1])
     TOT_LEN = ZEROS_LEN + ONES_LEN
@@ -382,7 +393,7 @@ def main(acq_path, per_path, out_path, TRAIN_VAL_TEST_SPLIT):
     bias_labels(df, 9).to_csv(OUT_PATH + 'biased_10_90_train.txt', index=False, header=False)
 
     print('Biasing validation with 1-9 ratio...')
-    df = pd.read_csv(OUT_PATH + 'mergedVal.txt')
+    df = pd.read_csv(OUT_PATH + 'val.txt')
     ZEROS_LEN = len(df[df.iloc[:, -1] == 0])
     ONES_LEN = len(df[df.iloc[:, -1] == 1])
     TOT_LEN = ZEROS_LEN + ONES_LEN
@@ -395,7 +406,7 @@ def main(acq_path, per_path, out_path, TRAIN_VAL_TEST_SPLIT):
     bias_labels(df, 9).to_csv(OUT_PATH + 'biased_10_90_val.txt', index=False, header=False)
 
     print('Biasing test with 1-9 ratio...')
-    df = pd.read_csv(OUT_PATH + 'mergedTest.txt')
+    df = pd.read_csv(OUT_PATH + 'test.txt')
     ZEROS_LEN = len(df[df.iloc[:, -1] == 0])
     ONES_LEN = len(df[df.iloc[:, -1] == 1])
     TOT_LEN = ZEROS_LEN + ONES_LEN
@@ -407,18 +418,20 @@ def main(acq_path, per_path, out_path, TRAIN_VAL_TEST_SPLIT):
     print()
     bias_labels(df, 9).to_csv(OUT_PATH + 'biased_10_90_test.txt', index=False, header=False)
 
+
     # Then again, for 33-66 split
     print('Biasing train with 1-2 ratio...')
-    df = pd.read_csv(OUT_PATH + 'mergedTrain.txt')
+    df = pd.read_csv(OUT_PATH + 'train.txt')
     bias_labels(df, 2).to_csv(OUT_PATH + 'biased_33_66_train.txt', index=False, header=False)
 
     print('Biasing validation with 1-2 ratio...')
-    df = pd.read_csv(OUT_PATH + 'mergedVal.txt')
+    df = pd.read_csv(OUT_PATH + 'val.txt')
     bias_labels(df, 2).to_csv(OUT_PATH + 'biased_33_66_val.txt', index=False, header=False)
 
     print('Biasing test with 1-2 ratio...')
-    df = pd.read_csv(OUT_PATH + 'mergedTest.txt')
+    df = pd.read_csv(OUT_PATH + 'test.txt')
     bias_labels(df, 2).to_csv(OUT_PATH + 'biased_33_66_test.txt', index=False, header=False)
+
 
 
 if __name__ == '__main__':
