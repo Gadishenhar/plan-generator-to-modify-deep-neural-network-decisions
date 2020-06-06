@@ -276,20 +276,20 @@ def bias_labels(df, zeros_to_ones_ratio):
 
 def main(acq_path, per_path, out_path, TRAIN_VAL_TEST_SPLIT):
 
-    """
+
     # Iteration 1: go over all of the acquisition files, and merge them with the appropriate performance data
     # If the merged data set files already exist, we can skip this step
     force_iter_1 = True
     if (not os.path.isfile(out_path + 'AcqPer_2018Q4.txt')) or force_iter_1:
-        for year in range(2001, 2018+1):
-            for quarter in range(1, 4+1):
+        for year in range(2013, 2013+1):
+            for quarter in range(4, 4+1):
                 suffix = str(year) + 'Q' + str(quarter) + '.txt'
                 acquisition_file_name = acq_path + 'Acquisition_' + suffix
                 performance_file_name = per_path + 'Performance_' + suffix
                 print('Merging data from the year', year, 'quarter', quarter, '...')
                 merged_df = merge_acq_per_data(acquisition_file_name, performance_file_name)
                 merged_df.to_csv(out_path + 'AcqPer_' + suffix, index=False, header=False)
-
+"""
     # Iteration 2: go over all of the merged data sets and extract from them all of the unique values from the seller
     # name and property state columns
     force_skip_iter_2 = False
@@ -366,7 +366,7 @@ def main(acq_path, per_path, out_path, TRAIN_VAL_TEST_SPLIT):
                 val.to_csv(OUT_PATH + 'val' + suffix, index=False, header=False)
                 test.to_csv(OUT_PATH + 'test' + suffix, index=False, header=False)
 
-    """
+  
 
     # The next step must be done manually (for now) outside of python:
     # * merge all of the new files to three (train, val and test)
@@ -431,7 +431,7 @@ def main(acq_path, per_path, out_path, TRAIN_VAL_TEST_SPLIT):
     print('Biasing test with 1-2 ratio...')
     df = pd.read_csv(OUT_PATH + 'test.txt')
     bias_labels(df, 2).to_csv(OUT_PATH + 'biased_33_66_test.txt', index=False, header=False)
-
+"""
 
 
 if __name__ == '__main__':
