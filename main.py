@@ -158,8 +158,8 @@ def main(PREP_PATH):
     print('First timestep', datetime.now())
     # Hyper parameters
     BATCH_SIZE = 30
-    LEARNING_RATE = 0.001  # The optimal learning rate for the Adam optimizer
-    EPOCH_COUNT = 10
+    LEARNING_RATE = 0.003  # The optimal learning rate for the Adam optimizer
+    EPOCH_COUNT = 3
     DROPOUT_RATE = 0.1
 
     # Initialize train and validation datasets and loaders
