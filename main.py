@@ -4,6 +4,7 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.utils.data
 from datetime import datetime
+import numpy as np
 
 class Dataset(torch.utils.data.Dataset): #Defining the dataset
 
@@ -164,7 +165,17 @@ def main(PREP_PATH):
 
     # Initialize train and validation datasets and loaders
     train_dataset = Dataset(PREP_PATH + 'train.txt')  # Sending to the class "dataset" only the samples that we chose to be the training samples (60% of the data)
-    train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=BATCH_SIZE)  # Calling the dataloader which will iterate over the training data and arrange it in batches
+
+    # Add the generated data
+    train_gen = pd.read_csv('dataset\montecarlo_trial.csv')
+
+    weights = np.array([0.33, 0.67])
+    labels = train_dataset.df.iloc[:, -1].astype(int).values
+    dataset_weights = weights[labels]
+    #print("weights are:", weights)
+    #weights = weights.double()
+    sampler = torch.utils.data.WeightedRandomSampler(weights=dataset_weights, num_samples=len(dataset_weights), replacement=True)
+    train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=False, sampler=sampler)  # Calling the dataloader which will iterate over the training data and arrange it in batches
 
     # GADI Change here the path if you want to use the full original validation set
     val_dataset = Dataset(PREP_PATH + 'val.txt')
