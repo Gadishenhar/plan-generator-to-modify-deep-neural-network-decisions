@@ -315,8 +315,8 @@ def main(acq_path, per_path, out_path, TRAIN_VAL_TEST_SPLIT):
     # If the merged data set files already exist, we can skip this step
     force_iter_1 = True
     if (not os.path.isfile(out_path + 'AcqPer_2018Q4.txt')) or force_iter_1:
-        for year in range(2013, 2013+1):
-            for quarter in range(4, 4+1):
+        for year in range(2000, 2018+1):
+            for quarter in range(1, 4+1):
                 suffix = str(year) + 'Q' + str(quarter) + '.txt'
                 acquisition_file_name = acq_path + 'Acquisition_' + suffix
                 performance_file_name = per_path + 'Performance_' + suffix
