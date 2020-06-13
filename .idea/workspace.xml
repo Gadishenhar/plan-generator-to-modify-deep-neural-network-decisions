@@ -39,7 +39,28 @@
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
-  <component name="RunManager" selected="Python.main">
+  <component name="RunManager" selected="Python.DatasetVisualizer">
+    <configuration name="DatasetVisualizer" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="plan-generator-to-modify-deep-neural-network-decisions" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/DatasetVisualizer.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="main" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="plan-generator-to-modify-deep-neural-network-decisions" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -83,7 +104,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="preprocessor" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="preprocessor" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
       <module name="plan-generator-to-modify-deep-neural-network-decisions" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -127,6 +148,7 @@
       <method v="2" />
     </configuration>
     <list>
+      <item itemvalue="Python.DatasetVisualizer" />
       <item itemvalue="Python.main" />
       <item itemvalue="Python.montecarlo" />
       <item itemvalue="Python.preprocessor" />
@@ -134,10 +156,10 @@
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.DatasetVisualizer" />
         <item itemvalue="Python.main" />
         <item itemvalue="Python.montecarlo" />
         <item itemvalue="Python.unbiased_val_check" />
-        <item itemvalue="Python.preprocessor" />
       </list>
     </recent_temporary>
   </component>
@@ -184,56 +206,56 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="260" y="278" key="FileChooserDialogImpl/0.0.1920.1040@0.0.1920.1040" timestamp="1585898751727" />
-    <state width="1259" height="145" key="GridCell.Tab.0.bottom" timestamp="1591199283400">
-      <screen x="0" y="0" width="1280" height="680" />
+    <state width="851" height="752" key="GridCell.Tab.0.bottom" timestamp="1591443073088">
+      <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1259" height="145" key="GridCell.Tab.0.bottom/0.0.1280.680@0.0.1280.680" timestamp="1591199283400" />
     <state width="1317" height="215" key="GridCell.Tab.0.bottom/0.0.1360.738@0.0.1360.738" timestamp="1586509498049" />
-    <state width="907" height="496" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1588969760940" />
-    <state width="1259" height="145" key="GridCell.Tab.0.center" timestamp="1591199283400">
-      <screen x="0" y="0" width="1280" height="680" />
+    <state width="851" height="752" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1591443073088" />
+    <state width="851" height="752" key="GridCell.Tab.0.center" timestamp="1591443073088">
+      <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1259" height="145" key="GridCell.Tab.0.center/0.0.1280.680@0.0.1280.680" timestamp="1591199283400" />
     <state width="1317" height="215" key="GridCell.Tab.0.center/0.0.1360.738@0.0.1360.738" timestamp="1586509498049" />
-    <state width="907" height="496" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1588969760940" />
-    <state width="1259" height="145" key="GridCell.Tab.0.left" timestamp="1591199283399">
-      <screen x="0" y="0" width="1280" height="680" />
+    <state width="851" height="752" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1591443073088" />
+    <state width="851" height="752" key="GridCell.Tab.0.left" timestamp="1591443073088">
+      <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1259" height="145" key="GridCell.Tab.0.left/0.0.1280.680@0.0.1280.680" timestamp="1591199283399" />
     <state width="1317" height="215" key="GridCell.Tab.0.left/0.0.1360.738@0.0.1360.738" timestamp="1586509498048" />
-    <state width="907" height="496" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1588969760940" />
-    <state width="1259" height="145" key="GridCell.Tab.0.right" timestamp="1591199283400">
-      <screen x="0" y="0" width="1280" height="680" />
+    <state width="851" height="752" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1591443073088" />
+    <state width="851" height="752" key="GridCell.Tab.0.right" timestamp="1591443073088">
+      <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1259" height="145" key="GridCell.Tab.0.right/0.0.1280.680@0.0.1280.680" timestamp="1591199283400" />
     <state width="1317" height="215" key="GridCell.Tab.0.right/0.0.1360.738@0.0.1360.738" timestamp="1586509498049" />
-    <state width="907" height="496" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1588969760940" />
-    <state width="1259" height="260" key="GridCell.Tab.1.bottom" timestamp="1590327636822">
-      <screen x="0" y="0" width="1280" height="680" />
+    <state width="851" height="752" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1591443073088" />
+    <state width="676" height="244" key="GridCell.Tab.1.bottom" timestamp="1591439112048">
+      <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1259" height="260" key="GridCell.Tab.1.bottom/0.0.1280.680@0.0.1280.680" timestamp="1590327636822" />
-    <state width="1372" height="245" key="GridCell.Tab.1.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1588354865888" />
-    <state width="1259" height="260" key="GridCell.Tab.1.center" timestamp="1590327636821">
-      <screen x="0" y="0" width="1280" height="680" />
+    <state width="676" height="244" key="GridCell.Tab.1.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1591439112048" />
+    <state width="676" height="244" key="GridCell.Tab.1.center" timestamp="1591439112048">
+      <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1259" height="260" key="GridCell.Tab.1.center/0.0.1280.680@0.0.1280.680" timestamp="1590327636821" />
-    <state width="1372" height="245" key="GridCell.Tab.1.center/0.0.1920.1040@0.0.1920.1040" timestamp="1588354865888" />
-    <state width="1259" height="260" key="GridCell.Tab.1.left" timestamp="1590327636821">
-      <screen x="0" y="0" width="1280" height="680" />
+    <state width="676" height="244" key="GridCell.Tab.1.center/0.0.1920.1040@0.0.1920.1040" timestamp="1591439112048" />
+    <state width="676" height="244" key="GridCell.Tab.1.left" timestamp="1591439112048">
+      <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1259" height="260" key="GridCell.Tab.1.left/0.0.1280.680@0.0.1280.680" timestamp="1590327636821" />
-    <state width="1372" height="245" key="GridCell.Tab.1.left/0.0.1920.1040@0.0.1920.1040" timestamp="1588354865888" />
-    <state width="1259" height="260" key="GridCell.Tab.1.right" timestamp="1590327636821">
-      <screen x="0" y="0" width="1280" height="680" />
+    <state width="676" height="244" key="GridCell.Tab.1.left/0.0.1920.1040@0.0.1920.1040" timestamp="1591439112048" />
+    <state width="676" height="244" key="GridCell.Tab.1.right" timestamp="1591439112048">
+      <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1259" height="260" key="GridCell.Tab.1.right/0.0.1280.680@0.0.1280.680" timestamp="1590327636821" />
-    <state width="1372" height="245" key="GridCell.Tab.1.right/0.0.1920.1040@0.0.1920.1040" timestamp="1588354865888" />
-    <state x="284" y="0" key="SettingsEditor" timestamp="1589444537881">
-      <screen x="0" y="0" width="1280" height="680" />
+    <state width="676" height="244" key="GridCell.Tab.1.right/0.0.1920.1040@0.0.1920.1040" timestamp="1591439112048" />
+    <state x="636" y="0" key="SettingsEditor" timestamp="1591430994868">
+      <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="284" y="0" key="SettingsEditor/0.0.1280.680@0.0.1280.680" timestamp="1589444537881" />
     <state x="133" y="30" key="SettingsEditor/0.0.1360.738@0.0.1360.738" timestamp="1586449670726" />
-    <state x="636" y="0" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1586533450858" />
+    <state x="636" y="0" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1591430994868" />
     <state x="465" y="243" key="com.intellij.ide.util.TipDialog" timestamp="1586474617932">
       <screen x="0" y="0" width="1360" height="738" />
     </state>
