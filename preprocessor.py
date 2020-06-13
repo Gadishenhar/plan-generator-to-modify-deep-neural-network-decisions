@@ -31,7 +31,52 @@ def print_useful_info(acq_df_col, col_num):
     print('')
 
 
+def handle_empty_fields(df):
+    """
+    Handles all of the empty fields by either filling them with the mean value of that column, or by dropping that
+    line altogether.
+    :param df: The data frame of the data set.
+    :return: The data frame after all empty fields have been taken care of.
+    """
+
+    # Column 10 - NUMBER OF BORROWERS
+    col_10_mean = df.iloc[:, 10].mean()
+    df.iloc[:, 10].fillna(col_10_mean, inplace=True)
+
+    # Column 11 - ORIGINAL DEBT TO INCOME RATIO
+    col_11_mean = df.iloc[:, 11].mean()
+    df.iloc[:, 11].fillna(col_11_mean, inplace=True)
+
+    # Column 12 - BORROWER CREDIT SCORE AT ORIGINATION
+    col_12_mean = df.iloc[:, 12].mean()
+    df.iloc[:, 12].fillna(col_12_mean, inplace=True)
+
+    # Column 20 - PRIMARY MORTGAGE INSURANCE PERCENT
+    df.iloc[:, 20].fillna(0, inplace=True)
+
+    # Column 22 - CO-BORROWER CREDIT SCORE AT ORIGINATION
+    col_22_mean = (df.iloc[:, 22]).mean()
+    df.iloc[:, 22].fillna(col_22_mean, inplace=True)
+
+    # Column 23 - MORTGAGE INSURANCE TYPE
+    df.iloc[:, 23].fillna(0, inplace=True)
+
+    # Drop any leftover entires that contains NaNs
+    df.dropna(inplace=True)
+
+    return df
+
+
 def prep_columns(df, seller_names, property_states):
+    """
+    Handles all empty fields, and tokenizes the entire data set.
+    :param df: The data frame of the data set.
+    :param seller_names: A list of all of the seller names. Will be tokenized based on the list's order.
+    :param property_states: A list of all of the property states. Will be tokenized based on the list's order.
+    :return: A cleaned and tokenized data frame.
+    """
+
+    handle_empty_fields(df)
 
     to_be_deleted = []
 
@@ -49,7 +94,6 @@ def prep_columns(df, seller_names, property_states):
     df.iloc[:, 1].replace('B', 3, inplace=True)
 
     # Column 2 - SELLER NAME
-    # TODO Consider using values indicative of prevalence of sellers
     print_useful_info(df.iloc[:, 2], 2)
     for i, seller in enumerate(seller_names):
         df.iloc[:, 2].replace(seller, i, inplace=True)
@@ -83,19 +127,16 @@ def prep_columns(df, seller_names, property_states):
     # Nothing to do
 
     # Column 10 - NUMBER OF BORROWERS
-    col_10_mean = df.iloc[:, 10].mean()
-    df.iloc[:, 10].fillna(col_10_mean, inplace=True)
     print_useful_info(df.iloc[:, 10], 10)
+    # Nothing to do
 
     # Column 11 - ORIGINAL DEBT TO INCOME RATIO
-    col_11_mean = df.iloc[:, 11].mean()
-    df.iloc[:, 11].fillna(col_11_mean, inplace=True)
     print_useful_info(df.iloc[:, 11], 11)
+    # Nothing to do
 
     # Column 12 - BORROWER CREDIT SCORE AT ORIGINATION
-    col_12_mean = df.iloc[:, 12].mean()
-    df.iloc[:, 12].fillna(col_12_mean, inplace=True)
     print_useful_info(df.iloc[:, 12], 12)
+    # Nothing to do
 
     # Column 13 - FIRST TIME HOME BUYER INDICATOR
     print_useful_info(df.iloc[:, 13], 13)
@@ -118,7 +159,6 @@ def prep_columns(df, seller_names, property_states):
     df.iloc[:, 15].replace('MH', 4, inplace=True)
     df.iloc[:, 15].replace('CP', 5, inplace=True)
 
-    # TODO Consider if keeping this column is beneficial or hurts us
     # Column 16 - NUMBER OF UNITS
     print_useful_info(df.iloc[:, 16], 16)
     # Nothing to do
@@ -131,7 +171,6 @@ def prep_columns(df, seller_names, property_states):
     df.iloc[:, 17].replace('U', 4, inplace=True)
 
     # Column 18 - PROPERTY STATE
-    # TODO Also sort by how common the values are?
     print_useful_info(df.iloc[:, 18], 18)
     for i, state in enumerate(property_states):
         df.iloc[:, 18].replace(state, i, inplace=True)
@@ -141,9 +180,8 @@ def prep_columns(df, seller_names, property_states):
     # Nothing to do
 
     # Column 20 - PRIMARY MORTGAGE INSURANCE PERCENT
-    # TODO Should default be 0 or mean()?
-    df.iloc[:, 20].fillna(0, inplace=True)
     print_useful_info(df.iloc[:, 20], 20)
+    # Nothing to do
 
     # Column 21 - PRODUCT TYPE
     print_useful_info(df.iloc[:, 21], 21)
@@ -156,21 +194,17 @@ def prep_columns(df, seller_names, property_states):
         to_be_deleted.append(COL_NAMES[21])
 
     # Column 22 - CO-BORROWER CREDIT SCORE AT ORIGINATION
-    col_22_mean = (df.iloc[:, 22]).mean()
-    df.iloc[:, 22].fillna(col_22_mean, inplace=True)
     print_useful_info(df.iloc[:, 22], 22)
+    # Nothing to do
 
     # Column 23 - MORTGAGE INSURANCE TYPE
-    df.iloc[:, 23].fillna(0, inplace=True)
     print_useful_info(df.iloc[:, 23], 23)
+    # Nothing to do
 
     # Column 24 - RELOCATION MORTGAGE INDICATOR
     print_useful_info(df.iloc[:, 24], 24)
     df.iloc[:, 24].replace('N', 1, inplace=True)
     df.iloc[:, 24].replace('Y', 2, inplace=True)
-
-    # Drop any leftover entires that contains NaNs (should be a single entry, due to a single NaN in column 9)
-    df.dropna(inplace=True)
 
     # Delete unneeded columns
     df.drop(to_be_deleted, axis=1, inplace=True)
@@ -276,12 +310,12 @@ def bias_labels(df, zeros_to_ones_ratio):
 
 def main(acq_path, per_path, out_path, TRAIN_VAL_TEST_SPLIT):
 
-    """
+
     # Iteration 1: go over all of the acquisition files, and merge them with the appropriate performance data
     # If the merged data set files already exist, we can skip this step
     force_iter_1 = True
     if (not os.path.isfile(out_path + 'AcqPer_2018Q4.txt')) or force_iter_1:
-        for year in range(2001, 2018+1):
+        for year in range(2000, 2018+1):
             for quarter in range(1, 4+1):
                 suffix = str(year) + 'Q' + str(quarter) + '.txt'
                 acquisition_file_name = acq_path + 'Acquisition_' + suffix
@@ -289,7 +323,7 @@ def main(acq_path, per_path, out_path, TRAIN_VAL_TEST_SPLIT):
                 print('Merging data from the year', year, 'quarter', quarter, '...')
                 merged_df = merge_acq_per_data(acquisition_file_name, performance_file_name)
                 merged_df.to_csv(out_path + 'AcqPer_' + suffix, index=False, header=False)
-
+"""
     # Iteration 2: go over all of the merged data sets and extract from them all of the unique values from the seller
     # name and property state columns
     force_skip_iter_2 = False
@@ -366,7 +400,7 @@ def main(acq_path, per_path, out_path, TRAIN_VAL_TEST_SPLIT):
                 val.to_csv(OUT_PATH + 'val' + suffix, index=False, header=False)
                 test.to_csv(OUT_PATH + 'test' + suffix, index=False, header=False)
 
-    """
+  
 
     # The next step must be done manually (for now) outside of python:
     # * merge all of the new files to three (train, val and test)
@@ -431,7 +465,7 @@ def main(acq_path, per_path, out_path, TRAIN_VAL_TEST_SPLIT):
     print('Biasing test with 1-2 ratio...')
     df = pd.read_csv(OUT_PATH + 'test.txt')
     bias_labels(df, 2).to_csv(OUT_PATH + 'biased_33_66_test.txt', index=False, header=False)
-
+"""
 
 
 if __name__ == '__main__':
