@@ -9,10 +9,13 @@ import numpy as np
 import preprocessor
 from visualize_tree import visualize_tree
 
-OPTIONS_PER_FEATURE = 9 #the number of different actions we want to allow for each of the features
-NUMBER_OF_FEATURES = 21 #Number of given features
-MAX_DEPTH = 3 #The maximal depth of our tree
-THRESHOLD = 0.5
+# Hyper Parameters
+MONTE_CARLO_ITERS_NUM = 10000  # Number of monte-carlo iteration, where each iteration is made of up selection, expansion, simulation and backpropogaition
+NET_THRESHOLD = 0.5 # The threshold of the network's output for which we determine it changed its decision
+NUM_OF_CHILDREN = 10  # The number of children created for each leaf
+EXPANSION_MAX_DEPTH = 3  # The maximal depth of the real built tree
+SIMULATION_MAX_DEPTH = 3  # The maximal total depth of the simulated tree
+
 
 class Action:
     def __init__(self, action_id, action_name, action_value, cost_value, feature_number):
@@ -21,6 +24,7 @@ class Action:
         self.action_value = action_value
         self.cost = cost_value
         self.feature = feature_number
+
 
 class Tree (object):
 
@@ -33,13 +37,11 @@ class Tree (object):
         self.num_of_successes = 0
         self.num_of_passes=0
 
+
 def monte_carlo_tree_search(root):
 
-    ITERS_NUM = 5
-    for i in range(ITERS_NUM):
-
+    for i in range(MONTE_CARLO_ITERS_NUM):
         print('Iteration', i)
-        input()
 
         # Selection stage
         path_to_leaf = selection(root)
@@ -49,33 +51,19 @@ def monte_carlo_tree_search(root):
             leaf = path_to_leaf[0]
 
         # Expansion Stage
-        if leaf.depth != MAX_DEPTH:
+        if leaf.depth != EXPANSION_MAX_DEPTH:
             next_child = expansion(leaf)
         else:
             next_child = leaf
-        print('After Expansion, the tree is')
-        visualize_tree(root)
-        print('\n\n\n\n\n\n\n\n\n\n\n\n')
-        input()
 
         next_child_sim = copy.copy(next_child)
 
         # Simulation Stage
         total_cost, all_actions, is_successful = simulation(next_child_sim)
 
-        print('After Simulation, the tree is')
-        visualize_tree(root)
-        print('\n\n\n\n\n\n\n\n\n\n\n\n')
-        input()
-
         # Back propogation !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         path_to_leaf.append(next_child)
         backpropogation(path_to_leaf, is_successful)
-
-        print('After back propogation, the tree is')
-        visualize_tree(root)
-        print('\n\n\n\n\n\n\n\n\n\n\n\n')
-        input()
 
     #Choose the best route of all and propose it to the user:
     proposed_actions = []
@@ -123,12 +111,13 @@ def expansion(leaf):
 
     if not len(leaf.child) == NUMBER_OF_ACTIONS:
         # Create N new children
-        # TODO Change this back to 20
-        NUM_OF_CHILDREN = 2
         added_children = 0
         while added_children < NUM_OF_CHILDREN:
 
-            action = random.choice(actions)
+            # Since continuous features have many more actions than the discrete ones, we first uniformly pick
+            # a feature, and then pick a random action from that feature.
+            key = random.choice(list(actions.keys()))
+            action = random.choice(actions[key])
 
             does_exist = False
             for c in leaf.child:
@@ -140,7 +129,7 @@ def expansion(leaf):
                 child = leaf.child[-1]
                 child.action = action
                 child.depth = leaf.depth + 1
-                child.total_cost += action.cost
+                child.total_cost = leaf.total_cost + action.cost
                 child.data[child.action.feature] = child.action.action_value * child.data[child.action.feature]
                 added_children += 1
 
@@ -150,10 +139,8 @@ def expansion(leaf):
 
 def simulation(node):
 
-    if node.depth == MAX_DEPTH:
+    if node.depth == SIMULATION_MAX_DEPTH:
         return node.total_cost, [node.action], False
-
-    #TODO - change the function's name after we export the loanrequest weights:
 
     # Tensor to dataframe
     df_data = pd.DataFrame(data=node.data.numpy().copy()).T
@@ -163,7 +150,7 @@ def simulation(node):
     norm_data = torch.tensor(norm_data.values).float()
     net_out = float(net.forward(norm_data))
 
-    if net_out <= THRESHOLD:
+    if net_out <= NET_THRESHOLD:
        return node.total_cost, [node.action], True
 
     current_action = random.choice(actions)
@@ -202,16 +189,24 @@ def best_route(node):
     max_score_idx = 1.5
     for i, child in enumerate(node.child):
         if child.num_of_successes==0:
+            print('Node', i, 'had no successes, and we passed through it', child.num_of_passes, 'times')
             continue
         score = A * child.num_of_successes / (child.num_of_passes + 1)
         score -= C * child.total_cost / (MEAN_ACTION_COST * child.depth)
         score -= D * child.depth
+        print('Node', i, 'has a score of', score)
         if score > max_score:
             max_score = score
             max_score_idx = i
 
-    if max_score_idx==1.5:
+    # If this node has no successful children at all, just add the current action
+    # and return
+    if max_score_idx == 1.5:
+        list_of_actions.append(node.action.action_name)
         return list_of_actions
+
+    print('Node', max_score_idx, 'was chosen and its action is', node.child[max_score_idx].action.action_name)
+    input()
 
     list_of_actions.extend(best_route(node.child[max_score_idx]))
     list_of_actions.append(node.action.action_name)
@@ -222,13 +217,15 @@ def generate_actions (feature,values,curr_value, is_discrete):
     for i in values:
         if is_discrete:
             action_value = i / curr_value.iloc[0,feature]
+            action_name = 'change feature ' + str(feature) + ' to ' + str(i)
             if i == curr_value.iloc[0,feature]:
                 continue
         else:
             action_value = i
+            action_name = str('multiply feature ') + str(feature) + str(' by ') + str(action_value)
         curr_cost = (abs(action_value * curr_value.iloc[0,feature] - stats_mean.iloc[feature+1])) / stats_std.iloc[feature+1]
         TempAction = Action(str(feature) + str(i),
-                            str('multiply feature ') + str(feature) + str(' by ') + str(action_value),
+                            action_name,
                             action_value, curr_cost, feature)
         actions.append(TempAction)
     return actions
@@ -249,26 +246,30 @@ df = preprocessor.prep_columns(df)
 
 
 #Generating actions for each feature:
-actions = [] ##Initializing an empty list of actions
-actions.extend(generate_actions(0,[1,2,3],df,True))  # Origination channel
-actions.extend(generate_actions(1,list(range(1,97)),df,True))  # Seller name
-actions.extend(generate_actions(4,list(np.arange(999,500,-1)/1000),df,False)) # UPB - Decrease by up to 50%
-actions.extend(generate_actions(5,list(np.arange(999,500,-1)/1000),df,False)) # LTV - Decrease by up to 50%
-actions.extend(generate_actions(6,list(np.arange(999,500,-1)/1000),df,False))  # CLTV
-actions.extend(generate_actions(7,[1,2,3],df,True)) ##Number of borrowers
-actions.extend(generate_actions(8,list(np.arange(999,500,-1)/1000),df,False))  # Debt to income
-actions.extend(generate_actions(9,list(np.arange(1001,1500)/1000),df,False))  # Credit Score
-actions.extend(generate_actions(10,[1,2],df,True)) #First time home buyer
-actions.extend(generate_actions(11,list(range(1,4)),df,True)) #LOAN PURPOSE
-actions.extend(generate_actions(12,list(range(1,5)),df,True)) # Number of units
-actions.extend(generate_actions(13,list(range(1,4)),df,True)) # Occupancy Type
-actions.extend(generate_actions(16,list(np.arange(1001,1500)/1000),df,False))  # PRIMARY MORTGAGE INSURANCE PERCENT
-actions.extend(generate_actions(18,list(np.arange(1001,1500)/1000),df,False))  # CoBorrower Credit Score
-actions.extend(generate_actions(19,list(range(1,4)),df,True)) #MORTGAGE INSURANCE TYPE
-actions.extend(generate_actions(20,list(range(1,3)),df,True)) #RELOCATION MORTGAGE INDICATOR
+actions = {} ##Initializing an empty dictionary of actions, where the key is the feature number it affects, and the value is a list of actions
+actions[0] = (generate_actions(0,[1,2,3],df,True))  # Origination channel
+actions[1] = (generate_actions(1,list(range(1,97)),df,True))  # Seller name
+actions[4] = (generate_actions(4,list(np.arange(999,500,-1)/1000),df,False)) # UPB - Decrease by up to 50%
+actions[5] = (generate_actions(5,list(np.arange(999,500,-1)/1000),df,False)) # LTV - Decrease by up to 50%
+actions[6] = (generate_actions(6,list(np.arange(999,500,-1)/1000),df,False))  # CLTV
+actions[7] = (generate_actions(7,[1,2,3],df,True)) ##Number of borrowers
+actions[8] = (generate_actions(8,list(np.arange(999,500,-1)/1000),df,False))  # Debt to income
+actions[9] = (generate_actions(9,list(np.arange(1001,1500)/1000),df,False))  # Credit Score
+actions[10] = (generate_actions(10,[1,2],df,True)) #First time home buyer
+actions[11] = (generate_actions(11,list(range(1,4)),df,True)) #LOAN PURPOSE
+actions[12] = (generate_actions(12,list(range(1,5)),df,True)) # Number of units
+actions[13] = (generate_actions(13,list(range(1,4)),df,True)) # Occupancy Type
+actions[16] = (generate_actions(16,list(np.arange(1001,1500)/1000),df,False))  # PRIMARY MORTGAGE INSURANCE PERCENT
+actions[18] = (generate_actions(18,list(np.arange(1001,1500)/1000),df,False))  # CoBorrower Credit Score
+actions[19] = (generate_actions(19,list(range(1,4)),df,True)) #MORTGAGE INSURANCE TYPE
+actions[20] = (generate_actions(20,list(range(1,3)),df,True)) #RELOCATION MORTGAGE INDICATOR
 
-NUMBER_OF_ACTIONS = len(actions)
-MEAN_ACTION_COST = statistics.mean([action.cost for action in actions]) # List Comprehension - create a list of only the costs of all of the actions
+# Flattened list of actions
+actions_list = []
+for key in actions:
+    actions_list.extend(actions[key])
+NUMBER_OF_ACTIONS = len(actions_list)
+MEAN_ACTION_COST = statistics.mean([action.cost for action in actions_list]) # List Comprehension - create a list of only the costs of all of the actions
 
 features_np_array = (df.iloc[0, :-1]).astype(float).to_numpy()
 features_tensor = torch.from_numpy(features_np_array).type(torch.FloatTensor)
