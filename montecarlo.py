@@ -35,8 +35,11 @@ class Tree (object):
 
 def monte_carlo_tree_search(root):
 
-    ITERS_NUM = 2000
+    ITERS_NUM = 5
     for i in range(ITERS_NUM):
+
+        print('Iteration', i)
+        input()
 
         # Selection stage
         path_to_leaf = selection(root)
@@ -48,18 +51,31 @@ def monte_carlo_tree_search(root):
         # Expansion Stage
         if leaf.depth != MAX_DEPTH:
             next_child = expansion(leaf)
-
         else:
             next_child = leaf
+        print('After Expansion, the tree is')
+        visualize_tree(root)
+        print('\n\n\n\n\n\n\n\n\n\n\n\n')
+        input()
 
         next_child_sim = copy.copy(next_child)
 
         # Simulation Stage
         total_cost, all_actions, is_successful = simulation(next_child_sim)
 
+        print('After Simulation, the tree is')
+        visualize_tree(root)
+        print('\n\n\n\n\n\n\n\n\n\n\n\n')
+        input()
+
         # Back propogation !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         path_to_leaf.append(next_child)
         backpropogation(path_to_leaf, is_successful)
+
+        print('After back propogation, the tree is')
+        visualize_tree(root)
+        print('\n\n\n\n\n\n\n\n\n\n\n\n')
+        input()
 
     #Choose the best route of all and propose it to the user:
     proposed_actions = []
@@ -107,7 +123,8 @@ def expansion(leaf):
 
     if not len(leaf.child) == NUMBER_OF_ACTIONS:
         # Create N new children
-        NUM_OF_CHILDREN = 20
+        # TODO Change this back to 20
+        NUM_OF_CHILDREN = 2
         added_children = 0
         while added_children < NUM_OF_CHILDREN:
 
