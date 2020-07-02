@@ -6,12 +6,13 @@ import math
 import statistics
 import copy
 import numpy as np
-from datetime import datetime
+import preprocessor
+from visualize_tree import visualize_tree
 
 OPTIONS_PER_FEATURE = 9 #the number of different actions we want to allow for each of the features
 NUMBER_OF_FEATURES = 21 #Number of given features
-MAX_DEPTH = 100 #The maximal depth of our tree
-THRESHOLD = 0.8
+MAX_DEPTH = 3 #The maximal depth of our tree
+THRESHOLD = 0.5
 
 class Action:
     def __init__(self, action_id, action_name, action_value, cost_value, feature_number):
@@ -22,44 +23,20 @@ class Action:
         self.feature = feature_number
 
 class Tree (object):
-    """
-    Each node consists of a "grade" on the loan test, which is the ouput of the aquisition net.
-    Each edge is a financial action that can be done, and will affect the grade.
-
-    Variables"
-   * np.array features - array of the 21 features (TODO might change this to save memory)
-   * int network_val - result for running the network on the current features
-   * Tree[] children - list of all children
-
-   * Action last_action_taken
-   * int total_rollouts
-   * int succ_rollouts
-
-
-    """
 
     def __init__(self, data):
-        self.left = None
         self.child = []
-        self.data = data
+        self.data = data.clone().detach()
         self.total_cost = 0
         self.action = None
         self.depth = 0
         self.num_of_successes = 0
         self.num_of_passes=0
-    def createChildren(self,amount):
-        for i in range (0,amount):
-            self.child.append(Tree())
-    def setChildrenValues(self,list):
-        for i in range(0,len(list)):
-            self.data.append(list[i])
 
 def monte_carlo_tree_search(root):
 
-    ITERS_NUM = 20
+    ITERS_NUM = 2000
     for i in range(ITERS_NUM):
-
-        #print('iteration', i)
 
         # Selection stage
         path_to_leaf = selection(root)
@@ -96,11 +73,11 @@ def monte_carlo_tree_search(root):
 
     print("In order to make your mortgage application approved, do the following actions:", str(proposed_actions))
 
+
 def selection(node):
 
     # If we reach a leaf, move on to expansion
     if len(node.child) == 0:
-        #print('The leaf depth is', node.depth)
         return [node]
 
 
@@ -128,10 +105,9 @@ def selection(node):
 
 def expansion(leaf):
 
-    # TODO Only adding 2 children means this node will never have more than two children, we miss possible routes.
     if not len(leaf.child) == NUMBER_OF_ACTIONS:
         # Create N new children
-        NUM_OF_CHILDREN = 2
+        NUM_OF_CHILDREN = 20
         added_children = 0
         while added_children < NUM_OF_CHILDREN:
 
@@ -158,20 +134,22 @@ def expansion(leaf):
 def simulation(node):
 
     if node.depth == MAX_DEPTH:
-        #print('Too deep')
         return node.total_cost, [node.action], False
 
     #TODO - change the function's name after we export the loanrequest weights:
 
-    net_out = float(net.forward((node.data)))
+    # Tensor to dataframe
+    df_data = pd.DataFrame(data=node.data.numpy().copy()).T
+    # Normalize
+    norm_data = preprocessor.norm_features(df_data, stats)
+    # Dataframe to tensor
+    norm_data = torch.tensor(norm_data.values).float()
+    net_out = float(net.forward(norm_data))
 
-    print(net_out)
     if net_out <= THRESHOLD:
-       print("Successful path!")
        return node.total_cost, [node.action], True
 
     current_action = random.choice(actions)
-    #print('Trying action:', current_action.action_name)
 
     node.child.append(Tree(node.data)) # Add child to the current node
     child = node.child[-1]
@@ -190,12 +168,9 @@ def backpropogation(nodes, is_successful):
     for node in nodes:
         node.num_of_passes += 1
         node.num_of_successes += int(is_successful)
-       #print(node.num_of_passes)
 
 
 def best_route(node):
-
-    #print('Searching for best route in depth', node.depth)
 
     #Recursion stop condition:
     temp = []
@@ -241,52 +216,23 @@ def generate_actions (feature,values,curr_value, is_discrete):
         actions.append(TempAction)
     return actions
 
-df = pd.read_csv('dataset\montecarlo_trial.csv')
+
+# For a given user, we want deterministic results
+random.seed(0)
 
 #Load the statistics about the data
 stats = pd.read_csv('dataset\statistics.csv')
 stats_mean = stats.iloc[1]
 stats_std = stats.iloc[2]
 
-"""
-actions = [] #Initializing an empty list which will contain all the actions
-for i in range(1,NUMBER_OF_FEATURES): #i represent the feature which we shift
-    if (i==2):
-        if (df.iloc[0, i]==0):
-            for bank in range(1, 17):
-                action_value = bank
-                ##TODO - consider the meaning of cost in this case
-                curr_cost = (abs(action_value * df.iloc[0, i] - stats_mean.iloc[i])) / stats_std.iloc[i]
-                TempAction = Action(str(i) + str(bank),
-                                    str('multiply feature ') + str(i) + str(' by ') + str(action_value),
-                                    action_value, curr_cost, i)
-                actions.append(TempAction)
-            continue
-        for bank in range(1,17):
-            action_value = bank/df.iloc[0, i]
-            ##TODO - consider the meaning of cost in this case
-            curr_cost = (abs(action_value * df.iloc[0, i] - stats_mean.iloc[i])) / stats_std.iloc[i]
-            TempAction = Action(str(i) + str(bank), str('multiply feature ') + str(i) + str(' by ') + str(action_value),
-                                action_value, curr_cost, i)
-            actions.append(TempAction)
-        continue
-    if (i==8):
-        for Borr in range(1,4):
-            action_value = 1 + Borr
-            curr_cost = (abs(action_value * df.iloc[0, i] - stats_mean.iloc[i])) / stats_std.iloc[i]
-            TempAction = Action(str(i) + str(Borr), str('multiply feature ') + str(i) + str(' by ') + str(action_value),
-                                action_value, curr_cost, i)
-            actions.append(TempAction)
-        continue
-    for j in range(1, OPTIONS_PER_FEATURE): #j represent the percentage in which is shift the feature
-        action_value=1+0.01*j
-        curr_cost = ( abs(action_value*df.iloc[0,i]-stats_mean.iloc[i]) ) / stats_std.iloc[i]
-        TempAction = Action(str(i)+str(j),str('multiply feature ')+str(i)+str(' by ')+str(action_value), action_value, curr_cost, i)
-        actions.append(TempAction)
-"""
+# Load request data and tokenize
+df = pd.read_csv('dataset\montecarlo_trial.csv', names=preprocessor.COL_NAMES)
+df = preprocessor.prep_columns(df)
 
-actions = [] ##Initializing an empty list of actions
+
+
 #Generating actions for each feature:
+actions = [] ##Initializing an empty list of actions
 actions.extend(generate_actions(0,[1,2,3],df,True))  # Origination channel
 actions.extend(generate_actions(1,list(range(1,97)),df,True))  # Seller name
 actions.extend(generate_actions(4,list(np.arange(999,500,-1)/1000),df,False)) # UPB - Decrease by up to 50%
@@ -297,7 +243,6 @@ actions.extend(generate_actions(8,list(np.arange(999,500,-1)/1000),df,False))  #
 actions.extend(generate_actions(9,list(np.arange(1001,1500)/1000),df,False))  # Credit Score
 actions.extend(generate_actions(10,[1,2],df,True)) #First time home buyer
 actions.extend(generate_actions(11,list(range(1,4)),df,True)) #LOAN PURPOSE
-#actions.extend(generate_actions(0,list(range(1,6)),df,True)) #Property type
 actions.extend(generate_actions(12,list(range(1,5)),df,True)) # Number of units
 actions.extend(generate_actions(13,list(range(1,4)),df,True)) # Occupancy Type
 actions.extend(generate_actions(16,list(np.arange(1001,1500)/1000),df,False))  # PRIMARY MORTGAGE INSURANCE PERCENT

@@ -21,6 +21,11 @@ CLEANED_COL_NAMES =  [
 ]
 
 
+# Save the final lists (this was after running previous section
+SELLER_NAMES = ['WELLS FARGO BANK,  NA', 'AMERIHOME MORTGAGE COMPANY, LLC', 'METLIFE HOME LOANS LLC', 'SANTANDER BANK, NATIONAL ASSOCIATION', 'PACIFIC UNION FINANCIAL, LLC', 'CASHCALL, INC.', 'PULTE MORTGAGE, L.L.C.', 'CMG MORTGAGE, INC', 'GMAC MORTGAGE, LLC', 'CAPITAL ONE, NATIONAL ASSOCIATION', 'USAA FEDERAL SAVINGS BANK', 'FIRST BANK DBA FIRST BANK MORTGAGE', 'LAKEVIEW LOAN SERVICING, LLC', 'FLAGSTAR BANK, FSB', 'PMT CREDIT RISK TRANSFER TRUST 2015-2', 'FDIC, RECEIVER, INDYMAC FEDERAL BANK FSB', 'CITIMORTGAGE, INC.', 'SUNTRUST MORTGAGE INC.', 'REGIONS BANK', 'HSBC BANK USA, NATIONAL ASSOCIATION', 'STONEGATE MORTGAGE CORPORATION', 'PMTT4', 'TRUIST BANK (FORMERLY SUNTRUST BANK)', 'CHICAGO MORTGAGE SOLUTIONS DBA INTERBANK MORTGAGE COMPANY', 'RBC MORTGAGE COMPANY', 'NYCB MORTGAGE COMPANY, LLC', 'FRANKLIN AMERICAN MORTGAGE COMPANY', 'THE BRANCH BANKING AND TRUST COMPANY', 'UNITED SHORE FINANCIAL SERVICES, LLC D/B/A UNITED WHOLESALE MORTGAGE', 'HOMEWARD RESIDENTIAL, INC.', 'NETBANK FUNDING SERVICES', 'COLORADO FEDERAL SAVINGS BANK', 'FREMONT BANK', 'PHH MORTGAGE CORPORATION (USAA FEDERAL SAVINGS BANK)', 'HOMEBRIDGE FINANCIAL SERVICES, INC.', 'SIERRA PACIFIC MORTGAGE COMPANY, INC.', 'FEDERAL HOME LOAN BANK OF CHICAGO', 'PROSPECT MORTGAGE, LLC', 'ASSOCIATED BANK, NA', 'PMT CREDIT RISK TRANSFER TRUST 2016-1', 'JPMORGAN CHASE BANK, NATIONAL ASSOCIATION', 'AMTRUST BANK', 'JPMORGAN CHASE BANK, NA', 'PRINCIPAL RESIDENTIAL MORTGAGE CAPITAL RESOURCES, LLC', 'GMAC MORTGAGE, LLC (USAA FEDERAL SAVINGS BANK)', 'U.S. BANK N.A.', 'BISHOPS GATE RESIDENTIAL MORTGAGE TRUST', 'GUILD MORTGAGE COMPANY', 'OTHER', 'EAGLE HOME MORTGAGE, LLC', 'WELLS FARGO CREDIT RISK TRANSFER SECURITIES TRUST 2015', 'EVERBANK', 'FAIRWAY INDEPENDENT MORTGAGE CORPORATION', 'ROUNDPOINT MORTGAGE COMPANY', 'THIRD FEDERAL SAVINGS AND LOAN', 'SUNTRUST BANK', 'NATIONSTAR MORTGAGE, LLC', 'PNC BANK, N.A.', 'METLIFE BANK, NA', 'J.P. MORGAN MADISON AVENUE SECURITIES TRUST, SERIES 2015-1', 'FLAGSTAR CAPITAL MARKETS CORPORATION', 'IMPAC MORTGAGE CORP.', 'UNITED SHORE FINANCIAL SERVICES, LLC DBA UNITED WHOLESALE MORTGAGE', 'LOANDEPOT.COM, LLC', 'ALLY BANK', 'QUICKEN LOANS INC.', 'THE HUNTINGTON NATIONAL BANK', 'CHICAGO MORTGAGE SOLUTIONS DBA INTERFIRST MORTGAGE COMPANY', 'WELLS FARGO BANK, N.A.', 'J.P. MORGAN MADISON AVENUE SECURITIES TRUST, SERIES 2014-1', 'DITECH FINANCIAL LLC', 'BANK OF AMERICA, N.A.', 'CHASE HOME FINANCE, LLC', 'CHASE HOME FINANCE', 'CHASE HOME FINANCE (CIE 1)', 'AMERISAVE MORTGAGE CORPORATION', 'MOVEMENT MORTGAGE, LLC', 'FIRST TENNESSEE BANK NATIONAL ASSOCIATION', 'FINANCE OF AMERICA MORTGAGE LLC', 'PENNYMAC CORP.', 'CHASE HOME FINANCE FRANKLIN AMERICAN MORTGAGE COMPANY', 'WITMER FUNDING, LLC', 'JP MORGAN CHASE BANK, NA', 'IRWIN MORTGAGE, CORPORATION', 'USAA DIRECT DELIVERY', 'CALIBER HOME LOANS, INC.', 'DOWNEY SAVINGS AND LOAN ASSOCIATION, F.A.', 'FLEET NATIONAL BANK', 'FREEDOM MORTGAGE CORP.', 'STEARNS LENDING, LLC', 'HARWOOD STREET FUNDING I, LLC', 'CITIZENS BANK, NATIONAL ASSOCIATION', 'NEW YORK COMMUNITY BANK', 'PHH MORTGAGE CORPORATION', 'FIFTH THIRD BANK', 'PROVIDENT FUNDING ASSOCIATES, L.P.']
+PROPERTY_STATES = ['MA', 'GA', 'MS', 'IN', 'WI', 'KS', 'AK', 'IL', 'NH', 'PA', 'HI', 'NM', 'NE', 'IA', 'AL', 'CT', 'TN', 'ID', 'NJ', 'ME', 'MI', 'UT', 'GU', 'ND', 'AZ', 'RI', 'OK', 'NY', 'MN', 'VA', 'AR', 'NC', 'SD', 'DE', 'VT', 'SC', 'TX', 'CA', 'WA', 'CO', 'OR', 'WY', 'MT', 'FL', 'MO', 'DC', 'PR', 'WV', 'VI', 'LA', 'MD', 'NV', 'KY', 'OH']
+
+
 def print_useful_info(acq_df_col, col_num):
     return 0
     print('Processing column', col_num)
@@ -67,7 +72,7 @@ def handle_empty_fields(df):
     return df
 
 
-def prep_columns(df, seller_names, property_states):
+def prep_columns(df, seller_names=SELLER_NAMES, property_states=PROPERTY_STATES):
     """
     Handles all empty fields, and tokenizes the entire data set.
     :param df: The data frame of the data set.
@@ -212,6 +217,29 @@ def prep_columns(df, seller_names, property_states):
     return df
 
 
+def norm_df(df, stats_df):
+    # .values.squeeze() because stack overflow says so
+    features_mean = stats_df.loc[1][1:-1].astype(float).values.squeeze()  # mean shows up in the second row of describe()
+    features_std = stats_df.loc[2][1:-1].astype(float).values.squeeze()  # std is third row
+    features_min = stats_df.loc[3][1:-1].astype(float).values.squeeze()  # min is fourth row
+    features_max = stats_df.loc[7][1:-1].astype(float).values.squeeze()  # max is eighth row
+    df.iloc[:, :-1] = (df.iloc[:, :-1] - features_mean) / features_std
+    df.iloc[:, :-1] = (df.iloc[:, :-1] - features_mean) / (features_max - features_min)
+    return df
+
+def norm_features(df, stats_df):
+    """
+    This function assumes df are only the features, and not the label
+    """
+    # .values.squeeze() because stack overflow says so
+    features_mean = stats_df.loc[1][1:-1].astype(float).values.squeeze()  # mean shows up in the second row of describe()
+    features_std = stats_df.loc[2][1:-1].astype(float).values.squeeze()  # std is third row
+    features_min = stats_df.loc[3][1:-1].astype(float).values.squeeze()  # min is fourth row
+    features_max = stats_df.loc[7][1:-1].astype(float).values.squeeze()  # max is eighth row
+    df = (df - features_mean) / features_std
+    df = (df - features_mean) / (features_max - features_min)
+    return df
+
 def split_train_val_test(df, OUT_PATH, TRAIN_VAL_TEST_SPLIT):
 
     # To make sure all of our sets have the same probability distribution, and because there are so few '1' labels,
@@ -315,8 +343,8 @@ def main(acq_path, per_path, out_path, TRAIN_VAL_TEST_SPLIT):
     # If the merged data set files already exist, we can skip this step
     force_iter_1 = True
     if (not os.path.isfile(out_path + 'AcqPer_2018Q4.txt')) or force_iter_1:
-        for year in range(2000, 2018+1):
-            for quarter in range(1, 4+1):
+        for year in range(2018, 2018+1):
+            for quarter in range(4, 4+1):
                 suffix = str(year) + 'Q' + str(quarter) + '.txt'
                 acquisition_file_name = acq_path + 'Acquisition_' + suffix
                 performance_file_name = per_path + 'Performance_' + suffix
@@ -377,13 +405,7 @@ def main(acq_path, per_path, out_path, TRAIN_VAL_TEST_SPLIT):
                 file_name = out_path + 'TokAcqPer_' + suffix
                 print('Normalizing year', year, 'quarter', quarter, '...')
                 df = pd.read_csv(file_name, names=CLEANED_COL_NAMES)
-                # .values.squeeze() because stack overflow says so
-                features_mean = stats_df.loc[1][1:-1].astype(float).values.squeeze()  # mean shows up in the second row of describe()
-                features_std = stats_df.loc[2][1:-1].astype(float).values.squeeze()  # std is third row
-                features_min = stats_df.loc[3][1:-1].astype(float).values.squeeze()  # min is fourth row
-                features_max = stats_df.loc[7][1:-1].astype(float).values.squeeze()  # max is eighth row
-                df.iloc[:, :-1] = (df.iloc[:, :-1] - features_mean) / features_std
-                df.iloc[:, :-1] = (df.iloc[:, :-1] - features_mean) / (features_max - features_min)
+                df = norm_df(df, stats_df)
                 df.to_csv(out_path + 'NormTokAcqPer_' + suffix, index=False, header=False)
 
     # Iter 5: Next, we need to go over each normalized tokenized data set file, and split it to a train file, a
