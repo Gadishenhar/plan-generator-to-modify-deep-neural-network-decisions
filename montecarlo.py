@@ -16,10 +16,6 @@ NUM_OF_CHILDREN = 10  # The number of children created for each leaf
 EXPANSION_MAX_DEPTH = 3  # The maximal depth of the real built tree
 SIMULATION_MAX_DEPTH = 3  # The maximal total depth of the simulated tree
 
-OPTIONS_PER_FEATURE = 9 #the number of different actions we want to allow for each of the features
-NUMBER_OF_FEATURES = 21 #Number of given features
-MAX_DEPTH = 3 #The maximal depth of our tree
-THRESHOLD = 0.8
 
 class Action:
     def __init__(self, action_id, action_name, action_value, cost_value, feature_number):
