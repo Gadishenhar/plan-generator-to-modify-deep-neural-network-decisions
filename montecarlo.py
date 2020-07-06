@@ -10,7 +10,7 @@ from datetime import datetime
 
 OPTIONS_PER_FEATURE = 9 #the number of different actions we want to allow for each of the features
 NUMBER_OF_FEATURES = 21 #Number of given features
-MAX_DEPTH = 100 #The maximal depth of our tree
+MAX_DEPTH = 3 #The maximal depth of our tree
 THRESHOLD = 0.8
 
 class Action:
