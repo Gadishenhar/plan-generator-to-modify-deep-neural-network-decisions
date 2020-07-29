@@ -4,7 +4,7 @@
 <!-- Insert your name -->
   <label for="fname">Name:</label><br>
   <input type="text" id="fname" name="fname"><br><br>
-  
+
 <!-- Insert Origination Channel -->
   <label for="orig_cha">Who are you?</label><br>
   <input type="radio" id="R" name="orig_cha" value="R">
@@ -13,7 +13,7 @@
   <label for="female">I am a financial institute</label><br>
   <input type="radio" id="B" name="orig_cha" value="B">
   <label for="other">I am a broker</label><br><br>
-  
+
 <!-- Insert Seller Name -->
   <label for="seller_name">Choose the bank you want to request a mortgage from:</label><br>
   <select id="seller_name" name="seller_name">
@@ -135,7 +135,7 @@
   <input type="text" id="ORIG_LOAN_T" name="ORIG_LOAN_T"><br>
 </form><br>
 
-<!-- ORIG_LOAN_T -->
+<!-- TOT_PRICE -->
   <label for="TOT_PRICE">What is the total price of the property (in dollars) </label><br>
   <input type="text" id="TOT_PRICE" name="TOT_PRICE"><br><br>
 
@@ -148,14 +148,14 @@
   <label for="CURRENT_AMOUNT">How much money do you need to receive at the moment? (in dollars) </label><br>
   <input type="text" id="CURRENT_AMOUNT" name="CURRENT_AMOUNT"><br>
 </form><br>
-  <label for="CURRENT_AMOUNT">If you have another loan that you have not payed off yet, please state its current balance. Otherwise, insert 0. </label><br>
-  <input type="text" id="CURRENT_AMOUNT" name="CURRENT_AMOUNT"><br>
+  <label for="SECOND_AMOUNT">If you have another loan that you have not payed off yet, please state its current balance. Otherwise, insert 0. </label><br>
+  <input type="text" id="SECOND_AMOUNT" name="SECOND_AMOUNT"><br>
 </form><br>
 
 <!-- NUM_BOR -->
  <label for="NUM_BOR">How many borrowers are you? </label><br>
  <input type="text" id="NUM_BOR" name="NUM_BOR"><br><br>
- 
+
 <!-- ORIG_DTIR -->
   <label for="INCOME">What is your income? (in dollars) </label><br>
   <input type="text" id="INCOME" name="INCOME"><br><br>
@@ -171,7 +171,7 @@
   <label for="1">Yes</label><br>
   <input type="radio" id="0" name="FST_TIME_IND" value="0">
   <label for="0">No</label><br><br>
-  
+
   <!-- LOAN_PURPOSE -->
 <label for="LOAN_PURPOSE">What is the purpose of the loan?</label><br>
   <input type="radio" id="P" name="LOAN_PURPOSE" value="P">
@@ -197,11 +197,11 @@
 <!-- ZIP_SHORT -->
   <label for="ZIP_SHORT">Enter the three first digits of the property's zip code: (if you don't know it, search it <a href="https://worldpostalcode.com/lookup">here</a>)</label><br>
   <input type="text" id="ZIP_SHORT" name="ZIP_SHORT"><br><br>
-  
+
 <!-- CO_BOR_C_SCORE -->
   <label for="CO_BOR_C_SCORE">What is the co-borrower's credit score?</label><br>
-  <input type="text" id="CO_BOR_C_SCORE" name="CO_BOR_C_SCORE"><br><br> 
-  
+  <input type="text" id="CO_BOR_C_SCORE" name="CO_BOR_C_SCORE"><br><br>
+
 <!-- PRIM_INS_PERC -->
 <label for="PRIM_INS_PERC">What percentage of the loan is covered by insurance? (%)</label><br>
 <input type="text" id="PRIM_INS_PERC" name="PRIM_INS_PERC"><br><br>
@@ -216,7 +216,7 @@
   <label for="3">Investor</label><br>
   <input type="radio" id="0" name="INSUR_TYPE" value="0">
   <label for="0">No insurance</label><br><br>
-  
+
 <!-- RELOC_IND -->
 <label for="RELOC_IND">Are you being relocated by your workplace?</label><br>
   <input type="radio" id="0" name="RELOC_IND" value="0">
@@ -281,19 +281,161 @@
   <option value="OH">OH</option>
     </select><br><br>
 
-<input type="button" id='Run' name="Run" value=" Run " onclick="main()">
+<input type="button" id='Run' name="Run" value=" Run " onclick="runPyScript()">
 
-<script src="http://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="http://code.jquery.com/jquery-3.5.1.js"></script>
 
-<script>
-	function goPython(){
-		$.ajax({
-		  url: "MYSCRIPT.py",
-		 context: document.body
-		}).done(function() {
-		 alert('finished python script');;
-		});
-	}	
+<script type=text/javascript>
+    function runPyScript(input){
+
+        // Name
+        let name = document.getElementById('fname').value;
+
+        // Origination channel
+        let origination_channel;
+        var radios = document.getElementsByName('orig_cha');
+        for (var i = 0, length = radios.length; i < length; i++) {
+            if (radios[i].checked) {
+                origination_channel = i + 1
+                break;
+            }
+        }
+
+        // Seller name
+        let seller_name = document.getElementById('seller_name').selectedIndex;
+
+        // Interest rate
+        let interest_rate = document.getElementById('ORIG_INT_R').value;
+
+        // UPB
+        let upb = document.getElementById('ORIG_UPB').value;
+
+        // Original loan T
+        let orig_loan_t = document.getElementById('ORIG_LOAN_T').value;
+
+        // Total price
+        let total_price = document.getElementById('TOT_PRICE').value;
+
+        // CLTV
+        let first_lien = document.getElementById('FIRST_LIEN').value;
+        let current_amount = document.getElementById('CURRENT_AMOUNT').value;
+        let second_amount = document.getElementById('SECOND_AMOUNT').value;
+
+        // Number of borrowers
+        let num_borr = document.getElementById('NUM_BOR').value;
+
+        // Original DTIR
+        let orig_dtir = document.getElementById('INCOME').value;
+
+        // Borrower credit score
+        let borrower_credit_score = document.getElementById('BOR_C_SCORE').value;
+
+        // First time indicator
+        let first_time;
+        var radios = document.getElementsByName('FST_TIME_IND');
+        for (var i = 0, length = radios.length; i < length; i++) {
+            if (radios[i].checked) {
+                first_time = i + 1
+                break;
+            }
+        }
+
+        // Loan purpose
+        let loan_purp;
+        var radios = document.getElementsByName('LOAN_PURPOSE');
+        for (var i = 0, length = radios.length; i < length; i++) {
+            if (radios[i].checked) {
+                loan_purp = i + 1
+                break;
+            }
+        }
+
+        // Number of units
+        let num_units = document.getElementById('NUM_UNITS').value;
+
+        // Occupancy type
+        let occ_type;
+        var radios = document.getElementsByName('OCC_TYPE');
+        for (var i = 0, length = radios.length; i < length; i++) {
+            if (radios[i].checked) {
+                occ_type = i + 1
+                break;
+            }
+        }
+
+        // zip
+        let zip = document.getElementById('ZIP_SHORT').value;
+
+        // Co-borrower credit score
+        let co_credit_score = document.getElementById('CO_BOR_C_SCORE').value;
+
+        // Insurance percentage
+        let ins_perc = document.getElementById('PRIM_INS_PERC').value;
+
+        // Insurance type
+        let ins_type;
+        var radios = document.getElementsByName('INSUR_TYPE');
+        for (var i = 0, length = radios.length; i < length; i++) {
+            if (radios[i].checked) {
+                ins_type = i + 1
+                break;
+            }
+        }
+
+        // Relocation indicator
+        let reloc_ind;
+        var radios = document.getElementsByName('RELOC_IND');
+        for (var i = 0, length = radios.length; i < length; i++) {
+            if (radios[i].checked) {
+                reloc_ind = i + 1
+                break;
+            }
+        }
+
+        // State
+        let state = document.getElementById('property_states').selectedIndex;
+
+        // Full html request
+        let html_req = "http://localhost:5000/TEST.py?" +
+            "&origination_channel=" + origination_channel +
+            "&seller_name=" + seller_name +
+            "&interest_rate=" + interest_rate +
+            "&upb=" + upb +
+            "&orig_loan_t=" + orig_loan_t +
+            "&total_price=" + total_price +
+            "&first_lien=" + first_lien +
+            "&current_amount" + current_amount +
+            "&second_amount" + second_amount +
+            "&num_borr" + num_borr +
+            "&orig_dtir=" + orig_dtir +
+            "&borrower_credit_score=" + borrower_credit_score +
+            "&first_time=" + first_time +
+            "&loan_purp=" + loan_purp +
+            "&num_units=" + num_units +
+            "&occ_type=" + occ_type +
+            "&zip=" + zip +
+            "&co_credit_score=" + co_credit_score +
+            "&ins_perc=" + ins_perc +
+            "&ins_type=" + ins_type +
+            "&reloc_ind=" + reloc_ind +
+            "&state=" + state;
+
+            console.log(html_req)
+
+        var jqXHR = $.ajax({
+            type: 'GET',
+            url: html_req,
+            success: function(response) {
+                console.log('success')
+                console.log(response);
+            },
+            error: function(response) {
+                console.log('fail');
+                console.log(response);
+            }
+        });
+    }
+</script>
 
 
 </form>
