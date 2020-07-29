@@ -10,7 +10,7 @@ import preprocessor
 class Dataset(torch.utils.data.Dataset): #Defining the dataset
 
     def __init__(self, csv_file,SAMPLING_RATE):
-        self.df = pd.read_csv(csv_file).sample(frac=SAMPLING_RATE) #Load the data table
+        self.df = pd.read_csv(csv_file)#.sample(frac=SAMPLING_RATE) #Load the data table
 
     def __len__(self):
         return len(self.df)
@@ -174,13 +174,13 @@ def main(PREP_PATH):
     train_gen = preprocessor.prep_generated_data('dataset/prep_biased_33_66/train_gen.xls')
     train_dataset.df = train_dataset.df.append(train_gen)
 
-    weights = np.array([1, 34])
+    weights = np.array([1, 2])
     labels = train_dataset.df.iloc[:, -1].astype(int).values
     dataset_weights = weights[labels]
     #print("weights are:", weights)
     #weights = weights.double()
     sampler = torch.utils.data.WeightedRandomSampler(weights=dataset_weights, num_samples=len(dataset_weights), replacement=True)
-    train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=False, sampler=None)  # Calling the dataloader which will iterate over the training data and arrange it in batches
+    train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=False, sampler=sampler)  # Calling the dataloader which will iterate over the training data and arrange it in batches
 
     # GADI Change here the path if you want to use the full original validation set
     val_dataset = Dataset(PREP_PATH + 'val.txt', SAMPLING_RATE_VAL)
