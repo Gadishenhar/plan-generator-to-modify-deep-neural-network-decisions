@@ -1,3 +1,5 @@
+import copy
+
 def visualize_tree(root):
     """
     Visualizes a monte carlo tree. Prints one full path at a time, from
@@ -39,5 +41,5 @@ def _visualize_tree(root, path_so_far, assigned_idx, parent_idx):
     for i, child in enumerate(root.child):
         # The index we will assign is a combination of the depth and a unique index
         next_assigned_idx = str(child.depth) + str(i)
-        _visualize_tree(child, path_so_far, next_assigned_idx, assigned_idx)
+        _visualize_tree(child, copy.copy(path_so_far), next_assigned_idx, assigned_idx)
 
