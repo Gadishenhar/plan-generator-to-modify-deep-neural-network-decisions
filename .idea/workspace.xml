@@ -148,10 +148,10 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Python.preprocessor" />
       <item itemvalue="Python.DatasetVisualizer" />
       <item itemvalue="Python.main" />
       <item itemvalue="Python.montecarlo" />
+      <item itemvalue="Python.preprocessor" />
       <item itemvalue="Python.unbiased_val_check" />
     </list>
     <recent_temporary>
