@@ -4,13 +4,11 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.utils.data
 from datetime import datetime
-import numpy as np
-import preprocessor
 
 class Dataset(torch.utils.data.Dataset): #Defining the dataset
 
-    def __init__(self, csv_file,SAMPLING_RATE):
-        self.df = pd.read_csv(csv_file).sample(frac=SAMPLING_RATE) #Load the data table
+    def __init__(self, csv_file):
+        self.df = pd.read_csv(csv_file) #Load the data table
 
     def __len__(self):
         return len(self.df)
@@ -107,9 +105,7 @@ class Net(nn.Module):
 
 def compute_loss(net, dataloader):
 
-    # For GPU - uncomment first line and comment second line
     #device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    device = torch.device("cpu")
     loss = 0
     count = 0
     count0 = 0
@@ -122,8 +118,8 @@ def compute_loss(net, dataloader):
     with torch.no_grad():  # Initializing the gradients to zero
         for data in dataloader:  # Iterate over the test samples
 
-            features = data['features'].to(device)
-            labels = data['label'].view(-1, 1).to(device)
+            features = data['features']#.to(device)
+            labels = data['label'].view(-1, 1)#.to(device)
 
             outputs = net(features)  # Fetching the network's predictions
 
@@ -153,6 +149,7 @@ def compute_loss(net, dataloader):
     a = (loss/count)
     b = (100*float(sens)/count1)
     c = (100*float(spec)/count0)
+
     return a, b, c
 
 
@@ -160,44 +157,22 @@ def main(PREP_PATH):
 
     print('First timestep', datetime.now())
     # Hyper parameters
-    BATCH_SIZE = 50
+    BATCH_SIZE = 30
     LEARNING_RATE = 0.001  # The optimal learning rate for the Adam optimizer
-    EPOCH_COUNT = 16
-    DROPOUT_RATE = 0.0001
-    SAMPLING_RATE_TRAIN = (1 / 24) ##The current training data is 24M rows, we want 1M
-    SAMPLING_RATE_VAL = (1 / 8)  ##The current validation data is 8M rows, we want 18
+    EPOCH_COUNT = 10
+    DROPOUT_RATE = 0.1
 
     # Initialize train and validation datasets and loaders
-    train_dataset = Dataset(PREP_PATH + 'train.txt', SAMPLING_RATE_TRAIN)  # Sending to the class "dataset" only the samples that we chose to be the training samples (60% of the data)
-
-    # Add the generated data
-    train_gen = preprocessor.prep_generated_data('dataset/prep_biased_33_66/train_gen.xls')
-    train_dataset.df = train_dataset.df.append(train_gen)
-
-    weights = np.array([1, 34])
-    labels = train_dataset.df.iloc[:, -1].astype(int).values
-    dataset_weights = weights[labels]
-    #print("weights are:", weights)
-    #weights = weights.double()
-    sampler = torch.utils.data.WeightedRandomSampler(weights=dataset_weights, num_samples=len(dataset_weights), replacement=True)
-    train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=False, sampler=sampler)  # Calling the dataloader which will iterate over the training data and arrange it in batches
+    train_dataset = Dataset(PREP_PATH + 'train.txt')  # Sending to the class "dataset" only the samples that we chose to be the training samples (60% of the data)
+    train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=BATCH_SIZE)  # Calling the dataloader which will iterate over the training data and arrange it in batches
 
     # GADI Change here the path if you want to use the full original validation set
-    val_dataset = Dataset(PREP_PATH + 'val.txt', SAMPLING_RATE_VAL)
-
-    # Add the generated data
-    val_gen = preprocessor.prep_generated_data('dataset/prep_biased_33_66/val_gen.xls')
-    val_dataset.df = val_dataset.df.append(val_gen)
-
+    val_dataset = Dataset(PREP_PATH + 'val.txt')
     val_dataloader = torch.utils.data.DataLoader(val_dataset, batch_size=BATCH_SIZE)
 
-    ## Instantiate the net
-
-    #For GPU - uncomment first line and comment second line
+    # Instantiate the net
     #device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    device = torch.device("cpu")
-
-    net = Net(DROPOUT_RATE, DEBUG=False).to(device)
+    net = Net(DROPOUT_RATE, DEBUG=False)#.to(device)
 
     # Define loss
     critertion = nn.BCELoss()  # We shall use Binary Cross-Entropy Loss
@@ -213,8 +188,8 @@ def main(PREP_PATH):
 
         for i, data in enumerate(train_dataloader, 0):
 
-            features = data['features'].to(device)
-            labels = data['label'].to(device)
+            features = data['features']#.to(device)
+            labels = data['label']#.to(device)
 
             optimizer.zero_grad()  # Initializing the gradients to zero
 
@@ -298,4 +273,4 @@ def main(PREP_PATH):
 
 
 if __name__ == '__main__':
-    main('dataset/prep_unbiased/')
+    main('dataset/prep_biased_33_66/')

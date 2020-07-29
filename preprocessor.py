@@ -3,22 +3,27 @@ import os.path
 
 # A full list of the columns in the complete merged dataset, before any columns are dropped
 COL_NAMES = [
-    'LOAN_ID', 'ORIG_CHAN', 'SELLER_NAME', 'ORIG_INT_R', 'ORIG_UPB',
-    'ORIG_LOAN_T', 'ORIG_DATE', 'FST_PAY_DATE', 'ORIG_LTV', 'ORIG_CLTV',
-    'NUM_BOR', 'ORIG_DTIR', 'BOR_C_SCORE', 'FST_TIME_IND', 'LOAN_PURPOSE',
-    'PROP_TYPE', 'NUM_UNITS', 'OCC_TYPE', 'PROP_STATE', 'ZIP_SHORT',
-    'PRIM_INS_PERC', 'PROD_TYPE', 'CO_BOR_C_SCORE', 'INSUR_TYPE', 'RELOC_IND',
+    'LOAN_ID',       'ORIG_CHAN', 'SELLER_NAME',    'ORIG_INT_R',   'ORIG_UPB',
+    'ORIG_LOAN_T',   'ORIG_DATE', 'FST_PAY_DATE',   'ORIG_LTV',     'ORIG_CLTV',
+    'NUM_BOR',       'ORIG_DTIR', 'BOR_C_SCORE',    'FST_TIME_IND', 'LOAN_PURPOSE',
+    'PROP_TYPE',     'NUM_UNITS', 'OCC_TYPE',       'PROP_STATE',   'ZIP_SHORT',
+    'PRIM_INS_PERC', 'PROD_TYPE', 'CO_BOR_C_SCORE', 'INSUR_TYPE',   'RELOC_IND',
     'DEFAULT'
 ]
 
-CLEANED_COL_NAMES = [
-    'ORIG_CHAN', 'SELLER_NAME', 'ORIG_INT_R', 'ORIG_UPB',
-    'ORIG_LOAN_T', 'ORIG_LTV', 'ORIG_CLTV',
-    'NUM_BOR', 'ORIG_DTIR', 'BOR_C_SCORE', 'FST_TIME_IND', 'LOAN_PURPOSE',
-    'NUM_UNITS', 'OCC_TYPE', 'PROP_STATE', 'ZIP_SHORT',
-    'PRIM_INS_PERC', 'PROD_TYPE', 'CO_BOR_C_SCORE', 'INSUR_TYPE', 'RELOC_IND',
+CLEANED_COL_NAMES =  [
+                     'ORIG_CHAN', 'SELLER_NAME',    'ORIG_INT_R',   'ORIG_UPB',
+    'ORIG_LOAN_T',                                  'ORIG_LTV',     'ORIG_CLTV',
+    'NUM_BOR',       'ORIG_DTIR', 'BOR_C_SCORE',    'FST_TIME_IND', 'LOAN_PURPOSE',
+                     'NUM_UNITS', 'OCC_TYPE',       'PROP_STATE',   'ZIP_SHORT',
+    'PRIM_INS_PERC', 'PROD_TYPE', 'CO_BOR_C_SCORE', 'INSUR_TYPE',   'RELOC_IND',
     'DEFAULT'
 ]
+
+
+# Save the final lists (this was after running previous section
+SELLER_NAMES = ['WELLS FARGO BANK,  NA', 'AMERIHOME MORTGAGE COMPANY, LLC', 'METLIFE HOME LOANS LLC', 'SANTANDER BANK, NATIONAL ASSOCIATION', 'PACIFIC UNION FINANCIAL, LLC', 'CASHCALL, INC.', 'PULTE MORTGAGE, L.L.C.', 'CMG MORTGAGE, INC', 'GMAC MORTGAGE, LLC', 'CAPITAL ONE, NATIONAL ASSOCIATION', 'USAA FEDERAL SAVINGS BANK', 'FIRST BANK DBA FIRST BANK MORTGAGE', 'LAKEVIEW LOAN SERVICING, LLC', 'FLAGSTAR BANK, FSB', 'PMT CREDIT RISK TRANSFER TRUST 2015-2', 'FDIC, RECEIVER, INDYMAC FEDERAL BANK FSB', 'CITIMORTGAGE, INC.', 'SUNTRUST MORTGAGE INC.', 'REGIONS BANK', 'HSBC BANK USA, NATIONAL ASSOCIATION', 'STONEGATE MORTGAGE CORPORATION', 'PMTT4', 'TRUIST BANK (FORMERLY SUNTRUST BANK)', 'CHICAGO MORTGAGE SOLUTIONS DBA INTERBANK MORTGAGE COMPANY', 'RBC MORTGAGE COMPANY', 'NYCB MORTGAGE COMPANY, LLC', 'FRANKLIN AMERICAN MORTGAGE COMPANY', 'THE BRANCH BANKING AND TRUST COMPANY', 'UNITED SHORE FINANCIAL SERVICES, LLC D/B/A UNITED WHOLESALE MORTGAGE', 'HOMEWARD RESIDENTIAL, INC.', 'NETBANK FUNDING SERVICES', 'COLORADO FEDERAL SAVINGS BANK', 'FREMONT BANK', 'PHH MORTGAGE CORPORATION (USAA FEDERAL SAVINGS BANK)', 'HOMEBRIDGE FINANCIAL SERVICES, INC.', 'SIERRA PACIFIC MORTGAGE COMPANY, INC.', 'FEDERAL HOME LOAN BANK OF CHICAGO', 'PROSPECT MORTGAGE, LLC', 'ASSOCIATED BANK, NA', 'PMT CREDIT RISK TRANSFER TRUST 2016-1', 'JPMORGAN CHASE BANK, NATIONAL ASSOCIATION', 'AMTRUST BANK', 'JPMORGAN CHASE BANK, NA', 'PRINCIPAL RESIDENTIAL MORTGAGE CAPITAL RESOURCES, LLC', 'GMAC MORTGAGE, LLC (USAA FEDERAL SAVINGS BANK)', 'U.S. BANK N.A.', 'BISHOPS GATE RESIDENTIAL MORTGAGE TRUST', 'GUILD MORTGAGE COMPANY', 'OTHER', 'EAGLE HOME MORTGAGE, LLC', 'WELLS FARGO CREDIT RISK TRANSFER SECURITIES TRUST 2015', 'EVERBANK', 'FAIRWAY INDEPENDENT MORTGAGE CORPORATION', 'ROUNDPOINT MORTGAGE COMPANY', 'THIRD FEDERAL SAVINGS AND LOAN', 'SUNTRUST BANK', 'NATIONSTAR MORTGAGE, LLC', 'PNC BANK, N.A.', 'METLIFE BANK, NA', 'J.P. MORGAN MADISON AVENUE SECURITIES TRUST, SERIES 2015-1', 'FLAGSTAR CAPITAL MARKETS CORPORATION', 'IMPAC MORTGAGE CORP.', 'UNITED SHORE FINANCIAL SERVICES, LLC DBA UNITED WHOLESALE MORTGAGE', 'LOANDEPOT.COM, LLC', 'ALLY BANK', 'QUICKEN LOANS INC.', 'THE HUNTINGTON NATIONAL BANK', 'CHICAGO MORTGAGE SOLUTIONS DBA INTERFIRST MORTGAGE COMPANY', 'WELLS FARGO BANK, N.A.', 'J.P. MORGAN MADISON AVENUE SECURITIES TRUST, SERIES 2014-1', 'DITECH FINANCIAL LLC', 'BANK OF AMERICA, N.A.', 'CHASE HOME FINANCE, LLC', 'CHASE HOME FINANCE', 'CHASE HOME FINANCE (CIE 1)', 'AMERISAVE MORTGAGE CORPORATION', 'MOVEMENT MORTGAGE, LLC', 'FIRST TENNESSEE BANK NATIONAL ASSOCIATION', 'FINANCE OF AMERICA MORTGAGE LLC', 'PENNYMAC CORP.', 'CHASE HOME FINANCE FRANKLIN AMERICAN MORTGAGE COMPANY', 'WITMER FUNDING, LLC', 'JP MORGAN CHASE BANK, NA', 'IRWIN MORTGAGE, CORPORATION', 'USAA DIRECT DELIVERY', 'CALIBER HOME LOANS, INC.', 'DOWNEY SAVINGS AND LOAN ASSOCIATION, F.A.', 'FLEET NATIONAL BANK', 'FREEDOM MORTGAGE CORP.', 'STEARNS LENDING, LLC', 'HARWOOD STREET FUNDING I, LLC', 'CITIZENS BANK, NATIONAL ASSOCIATION', 'NEW YORK COMMUNITY BANK', 'PHH MORTGAGE CORPORATION', 'FIFTH THIRD BANK', 'PROVIDENT FUNDING ASSOCIATES, L.P.']
+PROPERTY_STATES = ['MA', 'GA', 'MS', 'IN', 'WI', 'KS', 'AK', 'IL', 'NH', 'PA', 'HI', 'NM', 'NE', 'IA', 'AL', 'CT', 'TN', 'ID', 'NJ', 'ME', 'MI', 'UT', 'GU', 'ND', 'AZ', 'RI', 'OK', 'NY', 'MN', 'VA', 'AR', 'NC', 'SD', 'DE', 'VT', 'SC', 'TX', 'CA', 'WA', 'CO', 'OR', 'WY', 'MT', 'FL', 'MO', 'DC', 'PR', 'WV', 'VI', 'LA', 'MD', 'NV', 'KY', 'OH']
 
 
 def print_useful_info(acq_df_col, col_num):
@@ -67,7 +72,7 @@ def handle_empty_fields(df):
     return df
 
 
-def prep_columns(df, seller_names, property_states):
+def prep_columns(df, seller_names=SELLER_NAMES, property_states=PROPERTY_STATES):
     """
     Handles all empty fields, and tokenizes the entire data set.
     :param df: The data frame of the data set.
@@ -212,118 +217,31 @@ def prep_columns(df, seller_names, property_states):
     return df
 
 
-def prep_gen_columns(df, seller_names, property_states):
-
-
-    # Column 0 - ORIGINATION CHANNEL
-    print_useful_info(df.iloc[:, 0], 0)
-    df.iloc[:, 0].replace('R', 1, inplace=True)
-    df.iloc[:, 0].replace('C', 2, inplace=True)
-    df.iloc[:, 0].replace('B', 3, inplace=True)
-
-    # Column 1 - SELLER NAME
-    print_useful_info(df.iloc[:, 1], 1)
-    for i, seller in enumerate(seller_names):
-        df.iloc[:, 1].replace(seller, i, inplace=True)
-
-    # Column 2 - ORIGINAL INTEREST RATE
-    print_useful_info(df.iloc[:, 2], 2)
-    # Nothing to do
-
-    # Column 3 - ORIGINAL UPB
-    print_useful_info(df.iloc[:, 3], 3)
-    # Nothing to do
-
-    # Column 4 - ORIGINAL LOAN TERM
-    print_useful_info(df.iloc[:, 4], 4)
-    # Nothing to do
-
-    # Column 5 - ORIGINAL LOAN-TO-VALUE (LTV)
-    print_useful_info(df.iloc[:, 5], 5)
-    # Nothing to do
-
-    # Column 6 - ORIGINAL COMBINED LOAN-TO-VALUE (CLTV)
-    print_useful_info(df.iloc[:, 6], 6)
-    # Nothing to do
-
-    # Column 7 - NUMBER OF BORROWERS
-    print_useful_info(df.iloc[:, 7], 7)
-    # Nothing to do
-
-    # Column 8 - ORIGINAL DEBT TO INCOME RATIO
-    print_useful_info(df.iloc[:, 8], 8)
-    # Nothing to do
-
-    # Column 9 - BORROWER CREDIT SCORE AT ORIGINATION
-    print_useful_info(df.iloc[:, 9], 9)
-    # Nothing to do
-
-    # Column 10 - FIRST TIME HOME BUYER INDICATOR
-    print_useful_info(df.iloc[:, 10], 10)
-    df.iloc[:, 10].replace('N', 1, inplace=True)
-    df.iloc[:, 10].replace('Y', 2, inplace=True)
-    df.iloc[:, 10].replace('U', 3, inplace=True)
-
-    # Column 11 - LOAN PURPOSE
-    print_useful_info(df.iloc[:, 11], 11)
-    df.iloc[:, 11].replace('P', 1, inplace=True)
-    df.iloc[:, 11].replace('C', 2, inplace=True)
-    df.iloc[:, 11].replace('R', 3, inplace=True)
-    df.iloc[:, 11].replace('U', 4, inplace=True)
-
-    # Column 12 - PROPERTY TYPE
-    print_useful_info(df.iloc[:, 12], 12)
-    df.iloc[:, 12].replace('SF', 1, inplace=True)
-    df.iloc[:, 12].replace('PU', 2, inplace=True)
-    df.iloc[:, 12].replace('CO', 3, inplace=True)
-    df.iloc[:, 12].replace('MH', 4, inplace=True)
-    df.iloc[:, 12].replace('CP', 5, inplace=True)
-
-    # Column 13 - NUMBER OF UNITS
-    print_useful_info(df.iloc[:, 13], 13)
-    # Nothing to do
-
-    # Column 17 - OCCUPANCY TYPE
-    print_useful_info(df.iloc[:, 13], 13)
-    df.iloc[:, 13].replace('P', 1, inplace=True)
-    df.iloc[:, 13].replace('I', 2, inplace=True)
-    df.iloc[:, 13].replace('S', 3, inplace=True)
-    df.iloc[:, 13].replace('U', 4, inplace=True)
-
-    # Column 14 - PROPERTY STATE
-    print_useful_info(df.iloc[:, 14], 14)
-    for i, state in enumerate(property_states):
-        df.iloc[:, 14].replace(state, i, inplace=True)
-
-    # Column 15 - ZIP CODE SHORT
-    print_useful_info(df.iloc[:, 15], 15)
-    # Nothing to do
-
-    # Column 16 - PRIMARY MORTGAGE INSURANCE PERCENT
-    print_useful_info(df.iloc[:, 16], 16)
-    # Nothing to do
-
-    # Column 17 - PRODUCT TYPE
-    print_useful_info(df.iloc[:, 17], 17)
-    df.iloc[:, 17].replace('FRM', 0, inplace=True)
-
-    # Column 18 - CO-BORROWER CREDIT SCORE AT ORIGINATION
-    print_useful_info(df.iloc[:, 18], 18)
-    # Nothing to do
-
-    # Column 19 - MORTGAGE INSURANCE TYPE
-    print_useful_info(df.iloc[:, 19], 19)
-    # Nothing to do
-
-    # Column 20 - RELOCATION MORTGAGE INDICATOR
-    print_useful_info(df.iloc[:, 20], 20)
-    df.iloc[:, 20].replace('N', 1, inplace=True)
-    df.iloc[:, 20].replace('Y', 2, inplace=True)
-
+def norm_df(df, stats_df):
+    # .values.squeeze() because stack overflow says so
+    features_mean = stats_df.loc[1][1:-1].astype(float).values.squeeze()  # mean shows up in the second row of describe()
+    features_std = stats_df.loc[2][1:-1].astype(float).values.squeeze()  # std is third row
+    features_min = stats_df.loc[3][1:-1].astype(float).values.squeeze()  # min is fourth row
+    features_max = stats_df.loc[7][1:-1].astype(float).values.squeeze()  # max is eighth row
+    df.iloc[:, :-1] = (df.iloc[:, :-1] - features_mean) / features_std
+    df.iloc[:, :-1] = (df.iloc[:, :-1] - features_mean) / (features_max - features_min)
     return df
 
+def norm_features(df, stats_df):
+    """
+    This function assumes df are only the features, and not the label
+    """
+    # .values.squeeze() because stack overflow says so
+    features_mean = stats_df.loc[1][1:-1].astype(float).values.squeeze()  # mean shows up in the second row of describe()
+    features_std = stats_df.loc[2][1:-1].astype(float).values.squeeze()  # std is third row
+    features_min = stats_df.loc[3][1:-1].astype(float).values.squeeze()  # min is fourth row
+    features_max = stats_df.loc[7][1:-1].astype(float).values.squeeze()  # max is eighth row
+    df = (df - features_mean) / features_std
+    df = (df - features_mean) / (features_max - features_min)
+    return df
 
 def split_train_val_test(df, OUT_PATH, TRAIN_VAL_TEST_SPLIT):
+
     # To make sure all of our sets have the same probability distribution, and because there are so few '1' labels,
     # we will split the data frame by the label and split those individually
     zeros_df = df[df.iloc[:, -1] == 0]
@@ -374,27 +292,27 @@ def split_train_val_test(df, OUT_PATH, TRAIN_VAL_TEST_SPLIT):
 
 
 def merge_acq_per_data(acq_path, per_path):
+
     # Before we remove the identifier column, we need to process the performance data
-    PER_COL_NAMES = ['LOAN_ID',
-                     'DEFAULT']  # Choose two columns from the performance data: the loan's identifier + "DEFAULT": the date in which a costumer's house was confiscated
-    per_df = pd.read_csv(per_path, sep='|', usecols=[0, 15], names=PER_COL_NAMES)  # load the aquisition features
-    per_df.drop_duplicates(subset='LOAN_ID', keep='last', inplace=True)  # removing all duplicate rows from aquisition
+    PER_COL_NAMES = ['LOAN_ID', 'DEFAULT'] #Choose two columns from the performance data: the loan's identifier + "DEFAULT": the date in which a costumer's house was confiscated
+    per_df = pd.read_csv(per_path, sep='|', usecols=[0, 15], names=PER_COL_NAMES) #load the aquisition features
+    per_df.drop_duplicates(subset='LOAN_ID', keep='last', inplace=True) #removing all duplicate rows from aquisition
 
     # Replace all foreclosure dates (or their lack of) with 0 or 1 to represent whether a default took place
-    per_df.fillna(0, inplace=True)  # Filling all the NaNs with zeroes
-    per_df.loc[per_df[PER_COL_NAMES[1]] != 0, PER_COL_NAMES[
-        1]] = 1  # in any case there's a result other than 0 it means that the house indeed was confiscated so we write "1"
-    per_df.iloc[:, -1] = per_df.iloc[:, -1].astype(int)  # Converting to integers
+    per_df.fillna(0, inplace=True) #Filling all the NaNs with zeroes
+    per_df.loc[per_df[PER_COL_NAMES[1]] != 0, PER_COL_NAMES[1]] = 1 #in any case there's a result other than 0 it means that the house indeed was confiscated so we write "1"
+    per_df.iloc[:, -1] = per_df.iloc[:, -1].astype(int) #Converting to integers
 
     acq_df = pd.read_csv(acq_path, sep="|", names=COL_NAMES[:-1])
 
     # Merge with the acquisition data set, based on the load identifier
-    # print('Merging with performance data...\n')
-    df = pd.merge(acq_df, per_df, on='LOAN_ID', how='inner')  # merge according to Loan indentifier
+    #print('Merging with performance data...\n')
+    df = pd.merge(acq_df, per_df, on='LOAN_ID', how='inner') #merge according to Loan indentifier
     return df
 
 
 def bias_labels(df, zeros_to_ones_ratio):
+
     zeros_df = df[df.iloc[:, -1] == 0]
     ZEROS_LEN = len(zeros_df)
     ones_df = df[df.iloc[:, -1] == 1]
@@ -402,7 +320,7 @@ def bias_labels(df, zeros_to_ones_ratio):
 
     # Set new length for zeros, based on the ratio
     NEW_ZEROS_LEN = min(ZEROS_LEN, ONES_LEN * zeros_to_ones_ratio)
-    zeros_df = zeros_df.sample(frac=NEW_ZEROS_LEN / ZEROS_LEN)
+    zeros_df = zeros_df.sample(frac=NEW_ZEROS_LEN/ZEROS_LEN)
 
     df = zeros_df.append(ones_df).sample(frac=1)
 
@@ -419,20 +337,20 @@ def bias_labels(df, zeros_to_ones_ratio):
 
 
 def main(acq_path, per_path, out_path, TRAIN_VAL_TEST_SPLIT):
+
+
     # Iteration 1: go over all of the acquisition files, and merge them with the appropriate performance data
     # If the merged data set files already exist, we can skip this step
     force_iter_1 = True
     if (not os.path.isfile(out_path + 'AcqPer_2018Q4.txt')) or force_iter_1:
-        for year in range(2000, 2018 + 1):
-            for quarter in range(1, 4 + 1):
+        for year in range(2018, 2018+1):
+            for quarter in range(4, 4+1):
                 suffix = str(year) + 'Q' + str(quarter) + '.txt'
                 acquisition_file_name = acq_path + 'Acquisition_' + suffix
                 performance_file_name = per_path + 'Performance_' + suffix
                 print('Merging data from the year', year, 'quarter', quarter, '...')
                 merged_df = merge_acq_per_data(acquisition_file_name, performance_file_name)
                 merged_df.to_csv(out_path + 'AcqPer_' + suffix, index=False, header=False)
-
-
 """
     # Iteration 2: go over all of the merged data sets and extract from them all of the unique values from the seller
     # name and property state columns
@@ -487,13 +405,7 @@ def main(acq_path, per_path, out_path, TRAIN_VAL_TEST_SPLIT):
                 file_name = out_path + 'TokAcqPer_' + suffix
                 print('Normalizing year', year, 'quarter', quarter, '...')
                 df = pd.read_csv(file_name, names=CLEANED_COL_NAMES)
-                # .values.squeeze() because stack overflow says so
-                features_mean = stats_df.loc[1][1:-1].astype(float).values.squeeze()  # mean shows up in the second row of describe()
-                features_std = stats_df.loc[2][1:-1].astype(float).values.squeeze()  # std is third row
-                features_min = stats_df.loc[3][1:-1].astype(float).values.squeeze()  # min is fourth row
-                features_max = stats_df.loc[7][1:-1].astype(float).values.squeeze()  # max is eighth row
-                df.iloc[:, :-1] = (df.iloc[:, :-1] - features_mean) / features_std
-                df.iloc[:, :-1] = (df.iloc[:, :-1] - features_mean) / (features_max - features_min)
+                df = norm_df(df, stats_df)
                 df.to_csv(out_path + 'NormTokAcqPer_' + suffix, index=False, header=False)
 
     # Iter 5: Next, we need to go over each normalized tokenized data set file, and split it to a train file, a
@@ -577,70 +489,10 @@ def main(acq_path, per_path, out_path, TRAIN_VAL_TEST_SPLIT):
     bias_labels(df, 2).to_csv(OUT_PATH + 'biased_33_66_test.txt', index=False, header=False)
 """
 
-seller_names = ['WELLS FARGO BANK,  NA', 'AMERIHOME MORTGAGE COMPANY, LLC', 'METLIFE HOME LOANS LLC',
-                'SANTANDER BANK, NATIONAL ASSOCIATION', 'PACIFIC UNION FINANCIAL, LLC', 'CASHCALL, INC.',
-                'PULTE MORTGAGE, L.L.C.', 'CMG MORTGAGE, INC', 'GMAC MORTGAGE, LLC',
-                'CAPITAL ONE, NATIONAL ASSOCIATION', 'USAA FEDERAL SAVINGS BANK', 'FIRST BANK DBA FIRST BANK MORTGAGE',
-                'LAKEVIEW LOAN SERVICING, LLC', 'FLAGSTAR BANK, FSB', 'PMT CREDIT RISK TRANSFER TRUST 2015-2',
-                'FDIC, RECEIVER, INDYMAC FEDERAL BANK FSB', 'CITIMORTGAGE, INC.', 'SUNTRUST MORTGAGE INC.',
-                'REGIONS BANK', 'HSBC BANK USA, NATIONAL ASSOCIATION', 'STONEGATE MORTGAGE CORPORATION', 'PMTT4',
-                'TRUIST BANK (FORMERLY SUNTRUST BANK)', 'CHICAGO MORTGAGE SOLUTIONS DBA INTERBANK MORTGAGE COMPANY',
-                'RBC MORTGAGE COMPANY', 'NYCB MORTGAGE COMPANY, LLC', 'FRANKLIN AMERICAN MORTGAGE COMPANY',
-                'THE BRANCH BANKING AND TRUST COMPANY',
-                'UNITED SHORE FINANCIAL SERVICES, LLC D/B/A UNITED WHOLESALE MORTGAGE', 'HOMEWARD RESIDENTIAL, INC.',
-                'NETBANK FUNDING SERVICES', 'COLORADO FEDERAL SAVINGS BANK', 'FREMONT BANK',
-                'PHH MORTGAGE CORPORATION (USAA FEDERAL SAVINGS BANK)', 'HOMEBRIDGE FINANCIAL SERVICES, INC.',
-                'SIERRA PACIFIC MORTGAGE COMPANY, INC.', 'FEDERAL HOME LOAN BANK OF CHICAGO', 'PROSPECT MORTGAGE, LLC',
-                'ASSOCIATED BANK, NA', 'PMT CREDIT RISK TRANSFER TRUST 2016-1',
-                'JPMORGAN CHASE BANK, NATIONAL ASSOCIATION', 'AMTRUST BANK', 'JPMORGAN CHASE BANK, NA',
-                'PRINCIPAL RESIDENTIAL MORTGAGE CAPITAL RESOURCES, LLC',
-                'GMAC MORTGAGE, LLC (USAA FEDERAL SAVINGS BANK)', 'U.S. BANK N.A.',
-                'BISHOPS GATE RESIDENTIAL MORTGAGE TRUST', 'GUILD MORTGAGE COMPANY', 'OTHER',
-                'EAGLE HOME MORTGAGE, LLC', 'WELLS FARGO CREDIT RISK TRANSFER SECURITIES TRUST 2015', 'EVERBANK',
-                'FAIRWAY INDEPENDENT MORTGAGE CORPORATION', 'ROUNDPOINT MORTGAGE COMPANY',
-                'THIRD FEDERAL SAVINGS AND LOAN', 'SUNTRUST BANK', 'NATIONSTAR MORTGAGE, LLC', 'PNC BANK, N.A.',
-                'METLIFE BANK, NA', 'J.P. MORGAN MADISON AVENUE SECURITIES TRUST, SERIES 2015-1',
-                'FLAGSTAR CAPITAL MARKETS CORPORATION', 'IMPAC MORTGAGE CORP.',
-                'UNITED SHORE FINANCIAL SERVICES, LLC DBA UNITED WHOLESALE MORTGAGE', 'LOANDEPOT.COM, LLC', 'ALLY BANK',
-                'QUICKEN LOANS INC.', 'THE HUNTINGTON NATIONAL BANK',
-                'CHICAGO MORTGAGE SOLUTIONS DBA INTERFIRST MORTGAGE COMPANY', 'WELLS FARGO BANK, N.A.',
-                'J.P. MORGAN MADISON AVENUE SECURITIES TRUST, SERIES 2014-1', 'DITECH FINANCIAL LLC',
-                'BANK OF AMERICA, N.A.', 'CHASE HOME FINANCE, LLC', 'CHASE HOME FINANCE', 'CHASE HOME FINANCE (CIE 1)',
-                'AMERISAVE MORTGAGE CORPORATION', 'MOVEMENT MORTGAGE, LLC', 'FIRST TENNESSEE BANK NATIONAL ASSOCIATION',
-                'FINANCE OF AMERICA MORTGAGE LLC', 'PENNYMAC CORP.',
-                'CHASE HOME FINANCE FRANKLIN AMERICAN MORTGAGE COMPANY', 'WITMER FUNDING, LLC',
-                'JP MORGAN CHASE BANK, NA', 'IRWIN MORTGAGE, CORPORATION', 'USAA DIRECT DELIVERY',
-                'CALIBER HOME LOANS, INC.', 'DOWNEY SAVINGS AND LOAN ASSOCIATION, F.A.', 'FLEET NATIONAL BANK',
-                'FREEDOM MORTGAGE CORP.', 'STEARNS LENDING, LLC', 'HARWOOD STREET FUNDING I, LLC',
-                'CITIZENS BANK, NATIONAL ASSOCIATION', 'NEW YORK COMMUNITY BANK', 'PHH MORTGAGE CORPORATION',
-                'FIFTH THIRD BANK', 'PROVIDENT FUNDING ASSOCIATES, L.P.']
-property_states = ['MA', 'GA', 'MS', 'IN', 'WI', 'KS', 'AK', 'IL', 'NH', 'PA', 'HI', 'NM', 'NE', 'IA', 'AL', 'CT', 'TN',
-                   'ID', 'NJ', 'ME', 'MI', 'UT', 'GU', 'ND', 'AZ', 'RI', 'OK', 'NY', 'MN', 'VA', 'AR', 'NC', 'SD', 'DE',
-                   'VT', 'SC', 'TX', 'CA', 'WA', 'CO', 'OR', 'WY', 'MT', 'FL', 'MO', 'DC', 'PR', 'WV', 'VI', 'LA', 'MD',
-                   'NV', 'KY', 'OH']
-
-
-def prep_generated_data(path):
-    df = pd.read_excel(path) ##Load the generated data as a dataframe
-
-    #Activate the PP functions upon the dataframe:
-    prep_gen_columns(df, seller_names, property_states)
-    stats_df = pd.read_csv('dataset/stats.txt')
-    features_mean = stats_df.loc[1][1:-1].astype(
-        float).values.squeeze()  # mean shows up in the second row of describe()
-    features_std = stats_df.loc[2][1:-1].astype(float).values.squeeze()  # std is third row
-    features_min = stats_df.loc[3][1:-1].astype(float).values.squeeze()  # min is fourth row
-    features_max = stats_df.loc[7][1:-1].astype(float).values.squeeze()  # max is eighth row
-    df.iloc[:, :-1] = (df.iloc[:, :-1] - features_mean) / features_std
-    df.iloc[:, :-1] = (df.iloc[:, :-1] - features_mean) / (features_max - features_min)
-
-    table = df.to_csv('gen.csv', index=False, header=False) #Save the ready dataframe into a CSV-format table
-    return table
-
 
 if __name__ == '__main__':
     ACQ_PATH = 'Dataset/acquisition/'
     PER_PATH = 'Dataset/performance/'
     OUT_PATH = 'Dataset/prep_unbiased/'
     TRAIN_VAL_TEST_SPLIT = [0.6, 0.2, 0.2]
-    # main(ACQ_PATH, PER_PATH, OUT_PATH, TRAIN_VAL_TEST_SPLIT)
+    main(ACQ_PATH, PER_PATH, OUT_PATH, TRAIN_VAL_TEST_SPLIT)
