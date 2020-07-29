@@ -162,10 +162,10 @@ def main(PREP_PATH):
     # Hyper parameters
     BATCH_SIZE = 50
     LEARNING_RATE = 0.001  # The optimal learning rate for the Adam optimizer
-    EPOCH_COUNT = 16
+    EPOCH_COUNT = 10
     DROPOUT_RATE = 0.0001
-    SAMPLING_RATE_TRAIN = (1 / 24) ##The current training data is 24M rows, we want 1M
-    SAMPLING_RATE_VAL = (1 / 8)  ##The current validation data is 8M rows, we want 18
+    SAMPLING_RATE_TRAIN = 1  # The current training data is 24M rows, we want 5M
+    SAMPLING_RATE_VAL = 1  # The current validation data is 8M rows, we want 18
 
     # Initialize train and validation datasets and loaders
     train_dataset = Dataset(PREP_PATH + 'train.txt', SAMPLING_RATE_TRAIN)  # Sending to the class "dataset" only the samples that we chose to be the training samples (60% of the data)
@@ -180,7 +180,7 @@ def main(PREP_PATH):
     #print("weights are:", weights)
     #weights = weights.double()
     sampler = torch.utils.data.WeightedRandomSampler(weights=dataset_weights, num_samples=len(dataset_weights), replacement=True)
-    train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=False, sampler=sampler)  # Calling the dataloader which will iterate over the training data and arrange it in batches
+    train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=False, sampler=None)  # Calling the dataloader which will iterate over the training data and arrange it in batches
 
     # GADI Change here the path if you want to use the full original validation set
     val_dataset = Dataset(PREP_PATH + 'val.txt', SAMPLING_RATE_VAL)
@@ -248,7 +248,9 @@ def main(PREP_PATH):
         print('Current validation specificities are', val_spec)
 
         # GADI Please note this is the output model name and it is saved after every epoch. Be careful not to override files :)
-        torch.save(net.state_dict(), 'models/split_33_66_batchsize_' + str(BATCH_SIZE) + '_lr_' + str(LEARNING_RATE) + '_dropout_'+ str(DROPOUT_RATE) + '_epoch_' + str(epoch+1) +'.pkl')
+        torch.save(net.state_dict(), 'models/split_33_66_batchsize_' + str(BATCH_SIZE) + '_lr_' + str(LEARNING_RATE) + '_dropout_' +
+                   str(DROPOUT_RATE) + '_epoch_' + str(epoch+1) +'.pkl' + 'Amount_of_train_samples' + str(SAMPLING_RATE_TRAIN *
+                   len(train_dataset)) + 'Amount_of_val_samples' + str(SAMPLING_RATE_VAL * len(val_dataset)))
 
     print('Final training losses are', train_loss)
     print('Final validation losses are', val_loss)
@@ -298,4 +300,4 @@ def main(PREP_PATH):
 
 
 if __name__ == '__main__':
-    main('dataset/prep_unbiased/')
+    main('dataset/prep_biased_33_66/')

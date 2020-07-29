@@ -94,7 +94,133 @@ def monte_carlo_tree_search(root):
         print("Nothing will help you. You're doomed.")
         return
 
-    print("In order to make your mortgage application approved, do the following actions:", str(proposed_actions))
+    print("In order to make your mortgage application approved: ", str(proposed_actions))
+
+
+def create_action_name(feature, value):
+
+    if feature == 0:
+        if value == 1:
+            new_origination_channel = str('"Retail"')
+        elif value == 2:
+            new_origination_channel = str('"Correspondent"')
+        else:
+            new_origination_channel = str('"Broker"')
+        return str("Change your origination channel to " + new_origination_channel)
+
+    if feature == 1:
+        seller_names = ['WELLS FARGO BANK,  NA', 'AMERIHOME MORTGAGE COMPANY, LLC', 'METLIFE HOME LOANS LLC',
+                        'SANTANDER BANK, NATIONAL ASSOCIATION', 'PACIFIC UNION FINANCIAL, LLC', 'CASHCALL, INC.',
+                        'PULTE MORTGAGE, L.L.C.', 'CMG MORTGAGE, INC', 'GMAC MORTGAGE, LLC',
+                        'CAPITAL ONE, NATIONAL ASSOCIATION', 'USAA FEDERAL SAVINGS BANK',
+                        'FIRST BANK DBA FIRST BANK MORTGAGE', 'LAKEVIEW LOAN SERVICING, LLC', 'FLAGSTAR BANK, FSB',
+                        'PMT CREDIT RISK TRANSFER TRUST 2015-2', 'FDIC, RECEIVER, INDYMAC FEDERAL BANK FSB',
+                        'CITIMORTGAGE, INC.', 'SUNTRUST MORTGAGE INC.', 'REGIONS BANK',
+                        'HSBC BANK USA, NATIONAL ASSOCIATION', 'STONEGATE MORTGAGE CORPORATION', 'PMTT4',
+                        'TRUIST BANK (FORMERLY SUNTRUST BANK)',
+                        'CHICAGO MORTGAGE SOLUTIONS DBA INTERBANK MORTGAGE COMPANY', 'RBC MORTGAGE COMPANY',
+                        'NYCB MORTGAGE COMPANY, LLC', 'FRANKLIN AMERICAN MORTGAGE COMPANY',
+                        'THE BRANCH BANKING AND TRUST COMPANY',
+                        'UNITED SHORE FINANCIAL SERVICES, LLC D/B/A UNITED WHOLESALE MORTGAGE',
+                        'HOMEWARD RESIDENTIAL, INC.', 'NETBANK FUNDING SERVICES', 'COLORADO FEDERAL SAVINGS BANK',
+                        'FREMONT BANK', 'PHH MORTGAGE CORPORATION (USAA FEDERAL SAVINGS BANK)',
+                        'HOMEBRIDGE FINANCIAL SERVICES, INC.', 'SIERRA PACIFIC MORTGAGE COMPANY, INC.',
+                        'FEDERAL HOME LOAN BANK OF CHICAGO', 'PROSPECT MORTGAGE, LLC', 'ASSOCIATED BANK, NA',
+                        'PMT CREDIT RISK TRANSFER TRUST 2016-1', 'JPMORGAN CHASE BANK, NATIONAL ASSOCIATION',
+                        'AMTRUST BANK', 'JPMORGAN CHASE BANK, NA',
+                        'PRINCIPAL RESIDENTIAL MORTGAGE CAPITAL RESOURCES, LLC',
+                        'GMAC MORTGAGE, LLC (USAA FEDERAL SAVINGS BANK)', 'U.S. BANK N.A.',
+                        'BISHOPS GATE RESIDENTIAL MORTGAGE TRUST', 'GUILD MORTGAGE COMPANY', 'OTHER',
+                        'EAGLE HOME MORTGAGE, LLC', 'WELLS FARGO CREDIT RISK TRANSFER SECURITIES TRUST 2015',
+                        'EVERBANK', 'FAIRWAY INDEPENDENT MORTGAGE CORPORATION', 'ROUNDPOINT MORTGAGE COMPANY',
+                        'THIRD FEDERAL SAVINGS AND LOAN', 'SUNTRUST BANK', 'NATIONSTAR MORTGAGE, LLC', 'PNC BANK, N.A.',
+                        'METLIFE BANK, NA', 'J.P. MORGAN MADISON AVENUE SECURITIES TRUST, SERIES 2015-1',
+                        'FLAGSTAR CAPITAL MARKETS CORPORATION', 'IMPAC MORTGAGE CORP.',
+                        'UNITED SHORE FINANCIAL SERVICES, LLC DBA UNITED WHOLESALE MORTGAGE', 'LOANDEPOT.COM, LLC',
+                        'ALLY BANK', 'QUICKEN LOANS INC.', 'THE HUNTINGTON NATIONAL BANK',
+                        'CHICAGO MORTGAGE SOLUTIONS DBA INTERFIRST MORTGAGE COMPANY', 'WELLS FARGO BANK, N.A.',
+                        'J.P. MORGAN MADISON AVENUE SECURITIES TRUST, SERIES 2014-1', 'DITECH FINANCIAL LLC',
+                        'BANK OF AMERICA, N.A.', 'CHASE HOME FINANCE, LLC', 'CHASE HOME FINANCE',
+                        'CHASE HOME FINANCE (CIE 1)', 'AMERISAVE MORTGAGE CORPORATION', 'MOVEMENT MORTGAGE, LLC',
+                        'FIRST TENNESSEE BANK NATIONAL ASSOCIATION', 'FINANCE OF AMERICA MORTGAGE LLC',
+                        'PENNYMAC CORP.', 'CHASE HOME FINANCE FRANKLIN AMERICAN MORTGAGE COMPANY',
+                        'WITMER FUNDING, LLC', 'JP MORGAN CHASE BANK, NA', 'IRWIN MORTGAGE, CORPORATION',
+                        'USAA DIRECT DELIVERY', 'CALIBER HOME LOANS, INC.', 'DOWNEY SAVINGS AND LOAN ASSOCIATION, F.A.',
+                        'FLEET NATIONAL BANK', 'FREEDOM MORTGAGE CORP.', 'STEARNS LENDING, LLC',
+                        'HARWOOD STREET FUNDING I, LLC', 'CITIZENS BANK, NATIONAL ASSOCIATION',
+                        'NEW YORK COMMUNITY BANK', 'PHH MORTGAGE CORPORATION', 'FIFTH THIRD BANK',
+                        'PROVIDENT FUNDING ASSOCIATES, L.P.']
+        new_bank = seller_names[int(value) - 1]
+        return str("Request from a different bank:" + str(new_bank))
+
+    if feature == 4:
+        return str("Change your UPB to " + str(value*features_np_array[feature]))
+
+    if feature == 5:
+        return str("Change your LTV to " + str(value*features_np_array[feature]))
+
+    if feature == 6:
+        return str("Change your CLTV to " + str(value*features_np_array[feature]))
+
+    if feature == 7:
+        return str("Change the number of borrowers to " + str(value))
+
+    if feature == 8:
+        return str("Change your debt-to-income ratio to " + str(value * features_np_array[feature]))
+
+    if feature == 9:
+        return str("Change your credit score ratio to " + str(value * features_np_array[feature]))
+
+    if feature == 10:
+        if value == 1:
+            return str("Request through a non-first-time home buyer")
+        if value == 2:
+            return str("Request through a first-time home buyer")
+
+    if feature == 11:
+        if value == 1:
+            return str("Request as a purchase-purposed loan (and not a refinance-purposed loan, for example")
+        if value == 2:
+            return str("Request as a cash-out refinance loan")
+        if value == 3:
+            return str("Request as a non-cash-out refinance loan")
+        if value == 4:
+            return str("Request a general refinance loan without declaring whether it's for cash-out")
+
+    if feature == 12:
+        if value == 1:
+            return str("Request a property which consists of 1 unit")
+        else:
+            return str("Request a property which consists of " + str(value) + " units")
+
+    if feature == 13:
+        if value == 1:
+            return str("Request as your principal property")
+        if value == 2:
+            return str("Request as your second property")
+        if value == 3:
+            return str("Request as an investor")
+        if value == 4:
+            return str("Request without declaring whether it's your principal or second property or you're an investor")
+
+    if feature == 18:
+        return str("Change your co-borrower credit score to " + str(value*features_np_array[feature]))
+
+    if feature == 19:
+        if value == 1:
+            return str("Get a borrower-paid mortgage insurance")
+        if value == 2:
+            return str("Get a lender-paid mortgage insurance")
+        if value == 3:
+            return str("Get an investor-paid mortgage insurance")
+        if value == 4:
+            return str("Cancel your mortgage insurance")
+
+    if feature == 20:
+        if value == 1:
+            return str("Request as a non-relocation property")
+        if value == 2:
+            return str("Request as a property for relocation")
 
 def selection(node):
 
@@ -235,13 +361,12 @@ def generate_actions (feature,values,curr_value, is_discrete):
         else:
             action_value = i
         curr_cost = (abs(action_value * curr_value.iloc[0,feature] - stats_mean.iloc[feature+1])) / stats_std.iloc[feature+1]
-        TempAction = Action(str(feature) + str(i),
-                            str('multiply feature ') + str(feature) + str(' by ') + str(action_value),
+        TempAction = Action(str(feature) + str(i), create_action_name(feature,i),
                             action_value, curr_cost, feature)
         actions.append(TempAction)
     return actions
 
-df = pd.read_csv('dataset\montecarlo_trial.csv')
+    df = pd.read_csv('dataset\montecarlo_trial.csv')
 
 #Load the statistics about the data
 stats = pd.read_csv('dataset\statistics.csv')
@@ -285,6 +410,8 @@ for i in range(1,NUMBER_OF_FEATURES): #i represent the feature which we shift
         actions.append(TempAction)
 """
 
+features_np_array = (df.iloc[0, :-1]).astype(float).to_numpy()
+
 actions = [] ##Initializing an empty list of actions
 #Generating actions for each feature:
 actions.extend(generate_actions(0,[1,2,3],df,True))  # Origination channel
@@ -308,7 +435,6 @@ actions.extend(generate_actions(20,list(range(1,3)),df,True)) #RELOCATION MORTGA
 NUMBER_OF_ACTIONS = len(actions)
 MEAN_ACTION_COST = statistics.mean([action.cost for action in actions]) # List Comprehension - create a list of only the costs of all of the actions
 
-features_np_array = (df.iloc[0, :-1]).astype(float).to_numpy()
 features_tensor = torch.from_numpy(features_np_array).type(torch.FloatTensor)
 root = Tree(features_tensor)
 root.action = Action(action_id=0, action_name="current_state", action_value=0, cost_value=0, feature_number=0) #We create a fictive action for the root, just to make sure the algorithm runs well. We will delete this from the proposed list.
