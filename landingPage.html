@@ -119,7 +119,7 @@
 
 <!-- Interest rate -->
 <form>
-  <label for="ORIG_INT_R">If known, insert the "interest rate" defined by the bank:</label><br>
+  <label for="ORIG_INT_R">If known, insert the "interest rate" defined by the bank: (if unknown, insert -1)</label><br>
   <input type="text" id="ORIG_INT_R" name="ORIG_INT_R"><br>
 </form><br>
 
@@ -156,7 +156,11 @@
  <label for="NUM_BOR">How many borrowers are you? </label><br>
  <input type="text" id="NUM_BOR" name="NUM_BOR"><br><br>
 
-<!-- ORIG_DTIR -->
+<!-- MONTHLY_PAYMENTS -->
+  <label for="MONTHLY_PAYMENTS">How much do you pay every month to pay off debts and loans? (in dollars) </label><br>
+  <input type="text" id="MONTHLY_PAYMENTS" name="MONTHLY_PAYMENTS"><br><br>
+
+<!-- INCOME -->
   <label for="INCOME">What is your income? (in dollars) </label><br>
   <input type="text" id="INCOME" name="INCOME"><br><br>
 
@@ -324,8 +328,11 @@
         // Number of borrowers
         let num_borr = document.getElementById('NUM_BOR').value;
 
-        // Original DTIR
-        let orig_dtir = document.getElementById('INCOME').value;
+        // Monthly payments
+        let monthly_payments = document.getElementById('MONTHLY_PAYMENTS').value;
+
+        // Original income
+        let income = document.getElementById('INCOME').value;
 
         // Borrower credit score
         let borrower_credit_score = document.getElementById('BOR_C_SCORE').value;
@@ -396,18 +403,19 @@
         let state = document.getElementById('property_states').selectedIndex;
 
         // Full html request
-        let html_req = "http://localhost:5000/TEST.py?" +
-            "&origination_channel=" + origination_channel +
+        let html_req = "http://localhost:5000/test_candidate.py?" +
+            "origination_channel=" + origination_channel +
             "&seller_name=" + seller_name +
             "&interest_rate=" + interest_rate +
             "&upb=" + upb +
             "&orig_loan_t=" + orig_loan_t +
             "&total_price=" + total_price +
             "&first_lien=" + first_lien +
-            "&current_amount" + current_amount +
-            "&second_amount" + second_amount +
-            "&num_borr" + num_borr +
-            "&orig_dtir=" + orig_dtir +
+            "&current_amount=" + current_amount +
+            "&second_amount=" + second_amount +
+            "&num_borr=" + num_borr +
+            "&monthly_payments=" + monthly_payments +
+            "&income=" + income +
             "&borrower_credit_score=" + borrower_credit_score +
             "&first_time=" + first_time +
             "&loan_purp=" + loan_purp +

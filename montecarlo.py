@@ -1,5 +1,5 @@
 import random
-import loanrequest
+import main
 import torch
 import pandas as pd
 import math
@@ -9,13 +9,19 @@ import numpy as np
 import preprocessor
 from visualize_tree import visualize_tree
 
+# For a given user, we want deterministic results
+random.seed()
+
 # Hyper Parameters
 MONTE_CARLO_ITERS_NUM = 10000  # Number of monte-carlo iteration, where each iteration is made of up selection, expansion, simulation and backpropogaition
 NET_THRESHOLD = 0.5 # The threshold of the network's output for which we determine it changed its decision
 NUM_OF_CHILDREN = 10  # The number of children created for each leaf
 EXPANSION_MAX_DEPTH = 3  # The maximal depth of the real built tree
 SIMULATION_MAX_DEPTH = 3  # The maximal total depth of the simulated tree
-
+A = 1 # The constant that measures the weight we give to the number of successes when traveling the tree
+B = math.sqrt(2) # The constant that measures the weight we give to the number of visits
+C = 2 # The constant that measures the weight we give to the cost of the chosen actions
+D = math.sqrt(2) # The constant that measures the weight we give to the tree's depth
 
 class Action:
     def __init__(self, action_id, action_name, action_value, cost_value, feature_number):
@@ -71,10 +77,9 @@ def monte_carlo_tree_search(root):
     proposed_actions = proposed_actions[:-1]
 
     if proposed_actions==[]:
-        print("Nothing will help you. You're doomed.")
-        return
+        return str("No reasonable changes to help your application become approved have been found.")
 
-    print("In order to make your mortgage application approved: ", str(proposed_actions))
+    return str("In order to make your mortgage application approved: " + str(proposed_actions))
 
 
 def create_action_name(feature, value):
@@ -240,7 +245,8 @@ def expansion(leaf):
 
             # Since continuous features have many more actions than the discrete ones, we first uniformly pick
             # a feature, and then pick a random action from that feature.
-            key = random.choice(list(actions.keys()))
+            key_list = list(actions.keys())
+            key = random.choice(key_list)
             action = random.choice(actions[key])
 
             does_exist = False
@@ -277,7 +283,9 @@ def simulation(node):
     if net_out <= NET_THRESHOLD:
        return node.total_cost, [node.action], True
 
-    current_action = random.choice(actions)
+    key_list = list(actions.keys())
+    key = random.choice(key_list)
+    current_action = random.choice(actions[key])
 
     node.child.append(Tree(node.data)) # Add child to the current node
     child = node.child[-1]
@@ -307,8 +315,7 @@ def best_route(node):
         return temp
 
     list_of_actions = []
-    A = 1
-    C = D = math.sqrt(2)
+
     max_score = -math.inf
     max_score_idx = 1.5
     for i, child in enumerate(node.child):
@@ -352,10 +359,6 @@ def generate_actions (feature,values,curr_value, is_discrete):
         actions.append(TempAction)
     return actions
 
-
-# For a given user, we want deterministic results
-random.seed(0)
-
 #Load the statistics about the data
 stats = pd.read_csv('dataset\statistics.csv')
 stats_mean = stats.iloc[1]
@@ -398,7 +401,8 @@ features_tensor = torch.from_numpy(features_np_array).type(torch.FloatTensor)
 root = Tree(features_tensor)
 root.action = Action(action_id=0, action_name="current_state", action_value=0, cost_value=0, feature_number=0) #We create a fictive action for the root, just to make sure the algorithm runs well. We will delete this from the proposed list.
 
-net = loanrequest.Net(DROPOUT_RATE=0.1)
-net.load_state_dict(torch.load('models\split_33_66_batchsize_500_lr_0.001_dropout_0.1_epoch_1.pkl', map_location='cpu'))
+net = main.Net(DROPOUT_RATE=0.1)
+net.load_state_dict(torch.load('models/final_weights.pkl', map_location='cpu'))
 
-monte_carlo_tree_search(root)
+res = monte_carlo_tree_search(root)
+print(res)
