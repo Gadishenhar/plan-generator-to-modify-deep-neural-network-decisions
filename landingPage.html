@@ -287,6 +287,10 @@
 
 <input type="button" id='Run' name="Run" value=" Run " onclick="runPyScript()">
 
+<br>
+
+<h1 id='plan'></h1>
+
 <script type="text/javascript" src="http://code.jquery.com/jquery-3.5.1.js"></script>
 
 <script type=text/javascript>
@@ -428,17 +432,16 @@
             "&reloc_ind=" + reloc_ind +
             "&state=" + state;
 
-            console.log(html_req)
-
         var jqXHR = $.ajax({
             type: 'GET',
             url: html_req,
             success: function(response) {
-                console.log('success')
+                console.log('successsss')
                 console.log(response);
+                document.getElementById('plan').innerHTML = response
             },
             error: function(response) {
-                console.log('fail');
+                console.log('faillll');
                 console.log(response);
             }
         });

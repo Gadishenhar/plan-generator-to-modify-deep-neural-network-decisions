@@ -10,6 +10,7 @@ app = Flask(__name__)
 
 @app.route("/test_candidate.py")
 def hello():
+    print('hello called')
     origination_channel = request.args.get('origination_channel', type=float)
     seller_name = request.args.get('seller_name', type=float)
     interest_rate = request.args.get('interest_rate', type=float)
@@ -39,27 +40,30 @@ def hello():
     stats_std = stats.iloc[2]
 
     # Other parameters we need to calculate:
-    ltv = upb / total_price
-    cltv = ( first_lien + current_amount + second_amount ) / total_price
-    dti = monthly_payments / income
+    ltv = upb / total_price * 100
+    cltv = ( first_lien + current_amount + second_amount ) / total_price * 100
+    dti = monthly_payments / income * 100
     if interest_rate == -1:
         interest_rate = stats_mean[3]
 
+    # Build feature list for new person
     new_person = np.array([origination_channel, seller_name, interest_rate, upb, orig_loan_t, ltv, cltv,
-                           num_borr, dti, borrower_credit_score, first_time, loan_purp, num_units, occ_type, state, zip,
-                           ins_perc, float(1), co_credit_score, ins_type, reloc_ind])
+                           num_borr, dti, borrower_credit_score, first_time, loan_purp, num_units, occ_type, 1.0, state, zip,
+                           ins_perc, co_credit_score, ins_type, reloc_ind])
 
+    # Instansiate net
     net = main.Net(DROPOUT_RATE=0.0001)
     net.load_state_dict(
-        torch.load('models\split_33_66_batchsize_50_lr_0.001_dropout_0.0001_epoch_3_Amount_of_train_samples_1065962_Amount_of_val_samples_355334.pkl', map_location='cpu'))
+        torch.load('models/final_weights.pkl', map_location='cpu'))
 
+    # Call the net with the person's online data
     new_person_np = new_person
     new_person = pd.DataFrame(new_person).transpose().astype(float)
-    print(new_person)
     new_person_normalized = preprocessor.norm_features(new_person, montecarlo.stats)
     new_person_normalized = torch.tensor(new_person_normalized.values).float()
     net_out = float(net.forward(new_person_normalized))
 
+    # Either tell the client his application will be approved, or call monte-carlo code to suggest
     print(net_out)
     if round(net_out) == 0:
         print("Mortgage request is approved")
@@ -68,10 +72,9 @@ def hello():
         print("Mortgage request is declined")
         features_tensor = torch.from_numpy(new_person_np).type(torch.FloatTensor)
         root = montecarlo.Tree(features_tensor)
-        root.action = montecarlo.Action(action_id=0, action_name="current_state", action_value=0, cost_value=0,
-                             feature_number=0)  # We create a fictive action for the root, just to make sure the algorithm runs well. We will delete this from the proposed list.
-        print(montecarlo.monte_carlo_tree_search(root))
-        return
+        root.action = montecarlo.Action(action_id=0, action_name="current_state", action_value=0, cost_value=0, feature_number=0)  # We create a fictive action for the root, just to make sure the algorithm runs well. We will delete this from the proposed list.
+        plan = montecarlo.monte_carlo_tree_search(root)
+        return plan
 
 if __name__ == "__main__":
     app.run()
