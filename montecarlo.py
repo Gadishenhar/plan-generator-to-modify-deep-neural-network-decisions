@@ -367,9 +367,11 @@ stats_std = stats.iloc[2]
 # Load request data and tokenize
 df = pd.read_csv('dataset\montecarlo_trial.csv', names=preprocessor.COL_NAMES)
 df = preprocessor.prep_columns(df)
-
-
 features_np_array = (df.iloc[0, :-1]).astype(float).to_numpy()
+#print(features_np_array)
+#input()
+#print(preprocessor.norm_features(df.iloc[0, :-1], stats))
+#input()
 
 #Generating actions for each feature:
 actions = {} ##Initializing an empty dictionary of actions, where the key is the feature number it affects, and the value is a list of actions
@@ -398,6 +400,9 @@ NUMBER_OF_ACTIONS = len(actions_list)
 MEAN_ACTION_COST = statistics.mean([action.cost for action in actions_list]) # List Comprehension - create a list of only the costs of all of the actions
 
 features_tensor = torch.from_numpy(features_np_array).type(torch.FloatTensor)
+#print(preprocessor.norm_features(features_tensor, stats))
+#print(preprocessor.norm_features(features_tensor, stats))
+#input()
 root = Tree(features_tensor)
 root.action = Action(action_id=0, action_name="current_state", action_value=0, cost_value=0, feature_number=0) #We create a fictive action for the root, just to make sure the algorithm runs well. We will delete this from the proposed list.
 
@@ -405,4 +410,4 @@ net = main.Net(DROPOUT_RATE=0.1)
 net.load_state_dict(torch.load('models/final_weights.pkl', map_location='cpu'))
 
 res = monte_carlo_tree_search(root)
-print(res)
+#print(res)
