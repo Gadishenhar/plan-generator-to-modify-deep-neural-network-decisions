@@ -217,6 +217,113 @@ def prep_columns(df, seller_names=SELLER_NAMES, property_states=PROPERTY_STATES)
     return df
 
 
+def prep_gen_data(df, seller_names=SELLER_NAMES, property_states=PROPERTY_STATES):
+
+    # Column 0 - ORIGINATION CHANNEL
+    print_useful_info(df.iloc[:, 0], 0)
+    df.iloc[:, 0].replace('R', 1, inplace=True)
+    df.iloc[:, 0].replace('C', 2, inplace=True)
+    df.iloc[:, 0].replace('B', 3, inplace=True)
+
+    # Column 1 - SELLER NAME
+    print_useful_info(df.iloc[:, 1], 1)
+    for i, seller in enumerate(seller_names):
+        df.iloc[:, 1].replace(seller, i, inplace=True)
+
+    # Column 2 - ORIGINAL INTEREST RATE
+    print_useful_info(df.iloc[:, 2], 2)
+    # Nothing to do
+
+    # Column 3 - ORIGINAL UPB
+    print_useful_info(df.iloc[:, 3], 3)
+    # Nothing to do
+
+    # Column 4 - ORIGINAL LOAN TERM
+    print_useful_info(df.iloc[:, 4], 4)
+    # Nothing to do
+
+    # Column 5 - ORIGINAL LOAN-TO-VALUE (LTV)
+    print_useful_info(df.iloc[:, 5], 5)
+    # Nothing to do
+
+    # Column 6 - ORIGINAL COMBINED LOAN-TO-VALUE (CLTV)
+    print_useful_info(df.iloc[:, 6], 6)
+    # Nothing to do
+
+    # Column 7 - NUMBER OF BORROWERS
+    print_useful_info(df.iloc[:, 7], 7)
+    # Nothing to do
+
+    # Column 8 - ORIGINAL DEBT TO INCOME RATIO
+    print_useful_info(df.iloc[:, 8], 8)
+    # Nothing to do
+
+    # Column 9 - BORROWER CREDIT SCORE AT ORIGINATION
+    print_useful_info(df.iloc[:, 9], 9)
+    # Nothing to do
+
+    # Column 10 - FIRST TIME HOME BUYER INDICATOR
+    print_useful_info(df.iloc[:, 10], 10)
+    df.iloc[:, 10].replace('N', 1, inplace=True)
+    df.iloc[:, 10].replace('Y', 2, inplace=True)
+    df.iloc[:, 10].replace('U', 3, inplace=True)
+
+    # Column 11 - LOAN PURPOSE
+    print_useful_info(df.iloc[:, 11], 11)
+    df.iloc[:, 11].replace('P', 1, inplace=True)
+    df.iloc[:, 11].replace('C', 2, inplace=True)
+    df.iloc[:, 11].replace('R', 3, inplace=True)
+    df.iloc[:, 11].replace('U', 4, inplace=True)
+
+    # Column 12 - PROPERTY TYPE
+    print_useful_info(df.iloc[:, 12], 12)
+    df.iloc[:, 12].replace('SF', 1, inplace=True)
+    df.iloc[:, 12].replace('PU', 2, inplace=True)
+    df.iloc[:, 12].replace('CO', 3, inplace=True)
+    df.iloc[:, 12].replace('MH', 4, inplace=True)
+    df.iloc[:, 12].replace('CP', 5, inplace=True)
+
+    # Column 13 - NUMBER OF UNITS
+    print_useful_info(df.iloc[:, 13], 13)
+    # Nothing to do
+
+    # Column 17 - OCCUPANCY TYPE
+    print_useful_info(df.iloc[:, 13], 13)
+    df.iloc[:, 13].replace('P', 1, inplace=True)
+    df.iloc[:, 13].replace('I', 2, inplace=True)
+    df.iloc[:, 13].replace('S', 3, inplace=True)
+    df.iloc[:, 13].replace('U', 4, inplace=True)
+
+    # Column 14 - PROPERTY STATE
+    print_useful_info(df.iloc[:, 14], 14)
+    for i, state in enumerate(property_states):
+        df.iloc[:, 14].replace(state, i, inplace=True)
+
+    # Column 15 - ZIP CODE SHORT
+    print_useful_info(df.iloc[:, 15], 15)
+    # Nothing to do
+
+    # Column 16 - PRIMARY MORTGAGE INSURANCE PERCENT
+    print_useful_info(df.iloc[:, 16], 16)
+    # Nothing to do
+
+    # Column 17 - PRODUCT TYPE
+    print_useful_info(df.iloc[:, 17], 17)
+    df.iloc[:, 17].replace('FRM', 0, inplace=True)
+
+    # Column 18 - CO-BORROWER CREDIT SCORE AT ORIGINATION
+    print_useful_info(df.iloc[:, 18], 18)
+    # Nothing to do
+
+    # Column 19 - MORTGAGE INSURANCE TYPE
+    print_useful_info(df.iloc[:, 19], 19)
+    # Nothing to do
+
+    # Column 20 - RELOCATION MORTGAGE INDICATOR
+    print_useful_info(df.iloc[:, 20], 20)
+    df.iloc[:, 20].replace('N', 1, inplace=True)
+    df.iloc[:, 20].replace('Y', 2, inplace=True)
+
 def norm_df(df, stats_df):
     # .values.squeeze() because stack overflow says so
     features_mean = stats_df.loc[1][1:-1].astype(float).values.squeeze()  # mean shows up in the second row of describe()

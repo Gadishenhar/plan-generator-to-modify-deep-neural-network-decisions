@@ -131,7 +131,7 @@ def compute_loss(net, dataloader):
             loss += critertion(outputs, labels)
 
             # For computing specificity and sensitivity, we want to round the labels to their integer values
-            outputs = outputs.round()
+            outputs = (outputs > 0.4)
 
             labeled0 = (labels==0)
             labeled1 = (labels==1)
@@ -171,7 +171,8 @@ def main(PREP_PATH):
     train_dataset = Dataset(PREP_PATH + 'train.txt', SAMPLING_RATE_TRAIN)  # Sending to the class "dataset" only the samples that we chose to be the training samples (60% of the data)
 
     # Add the generated data
-    train_gen = preprocessor.prep_generated_data('dataset/prep_biased_33_66/train_gen.xls')
+    train_gen = pd.read_csv('dataset/prep_biased_33_66/train_gen.csv')
+    train_gen = preprocessor.prep_gen_data(train_gen)
     train_dataset.df = train_dataset.df.append(train_gen)
 
     weights = np.array([1, 2])
@@ -186,7 +187,8 @@ def main(PREP_PATH):
     val_dataset = Dataset(PREP_PATH + 'val.txt', SAMPLING_RATE_VAL)
 
     # Add the generated data
-    val_gen = preprocessor.prep_generated_data('dataset/prep_biased_33_66/val_gen.xls')
+    val_gen = pd.read_csv('dataset/prep_biased_33_66/val_gen.csv')
+    val_gen = preprocessor.prep_gen_data(val_gen)
     val_dataset.df = val_dataset.df.append(val_gen)
 
     val_dataloader = torch.utils.data.DataLoader(val_dataset, batch_size=BATCH_SIZE)
@@ -249,8 +251,8 @@ def main(PREP_PATH):
 
         # GADI Please note this is the output model name and it is saved after every epoch. Be careful not to override files :)
         torch.save(net.state_dict(), 'models/split_33_66_batchsize_' + str(BATCH_SIZE) + '_lr_' + str(LEARNING_RATE) + '_dropout_' +
-                   str(DROPOUT_RATE) + '_epoch_' + str(epoch+1) +'.pkl' + 'Amount_of_train_samples' + str(SAMPLING_RATE_TRAIN *
-                   len(train_dataset)) + 'Amount_of_val_samples' + str(SAMPLING_RATE_VAL * len(val_dataset)))
+                   str(DROPOUT_RATE) + '_epoch_' + str(epoch+1) + '_Amount_of_train_samples_' + str(SAMPLING_RATE_TRAIN *
+                   len(train_dataset)) + '_Amount_of_val_samples_' + str(SAMPLING_RATE_VAL * len(val_dataset)) + '.pkl')
 
     print('Final training losses are', train_loss)
     print('Final validation losses are', val_loss)
