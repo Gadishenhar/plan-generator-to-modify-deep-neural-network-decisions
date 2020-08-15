@@ -7,10 +7,12 @@ import statistics
 import copy
 import numpy as np
 import preprocessor
+from datetime import datetime
+
 from visualize_tree import visualize_tree
 
 # For a given user, we want deterministic results
-random.seed()
+random.seed(0)
 
 # Hyper Parameters
 MONTE_CARLO_ITERS_NUM = 10000  # Number of monte-carlo iteration, where each iteration is made of up selection, expansion, simulation and backpropogaition
@@ -154,7 +156,7 @@ def create_action_name(feature, value):
         return str("Change your debt-to-income ratio to " + str(value * features_np_array[feature]))
 
     if feature == 9:
-        return str("Change your credit score ratio to " + str(value * features_np_array[feature]))
+        return str("Change your credit score to " + str(value * features_np_array[feature]))
 
     if feature == 10:
         if value == 1:
@@ -359,6 +361,7 @@ def generate_actions (feature,values,curr_value, is_discrete):
         actions.append(TempAction)
     return actions
 
+print('First timestep', datetime.now())
 #Load the statistics about the data
 stats = pd.read_csv('dataset\statistics.csv')
 stats_mean = stats.iloc[1]
@@ -406,3 +409,4 @@ net.load_state_dict(torch.load('models/final_weights.pkl', map_location='cpu'))
 
 res = monte_carlo_tree_search(root)
 print(res)
+print('Second timestep', datetime.now())
