@@ -529,7 +529,7 @@ def main(acq_path, per_path, out_path, TRAIN_VAL_TEST_SPLIT):
                 val.to_csv(OUT_PATH + 'val' + suffix, index=False, header=False)
                 test.to_csv(OUT_PATH + 'test' + suffix, index=False, header=False)
 
-  
+
 
     # The next step must be done manually (for now) outside of python:
     # * merge all of the new files to three (train, val and test)
