@@ -65,7 +65,7 @@ def hello():
 
     # Either tell the client his application will be approved, or call monte-carlo code to suggest
     print(net_out)
-    if round(net_out) == 0:
+    if net_out < 0.4:
         print("Mortgage request is approved")
         return str("Mortgage request is approved")
     else:

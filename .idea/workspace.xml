@@ -39,7 +39,7 @@
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
-  <component name="RunManager" selected="Python.montecarlo">
+  <component name="RunManager" selected="Python.test_candidate">
     <configuration name="DatasetVisualizer" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="plan-generator-to-modify-deep-neural-network-decisions" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -126,6 +126,27 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="test_candidate" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="plan-generator-to-modify-deep-neural-network-decisions" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/test_candidate.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="unbiased_val_check" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="plan-generator-to-modify-deep-neural-network-decisions" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -153,13 +174,15 @@
       <item itemvalue="Python.main" />
       <item itemvalue="Python.montecarlo" />
       <item itemvalue="Python.unbiased_val_check" />
+      <item itemvalue="Python.test_candidate" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.test_candidate" />
+        <item itemvalue="Python.unbiased_val_check" />
         <item itemvalue="Python.montecarlo" />
         <item itemvalue="Python.main" />
         <item itemvalue="Python.DatasetVisualizer" />
-        <item itemvalue="Python.unbiased_val_check" />
       </list>
     </recent_temporary>
   </component>
@@ -189,34 +212,29 @@
     </ignored-roots>
   </component>
   <component name="WindowStateProjectService">
-    <state x="191" y="0" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1596040319739">
+    <state x="191" y="0" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1597489299654">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state x="191" y="0" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1280.680@0.0.1280.680" timestamp="1596040319739" />
-    <state x="414" y="174" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1588321350845" />
-    <state width="1627" height="466" key="DebuggerActiveHint" timestamp="1587831359172">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state width="1627" height="466" key="DebuggerActiveHint/0.0.1920.1040@0.0.1920.1040" timestamp="1587831359172" />
-    <state width="1163" height="155" key="GridCell.Tab.0.bottom" timestamp="1597415813977">
+    <state x="191" y="0" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1280.680@0.0.1280.680" timestamp="1597489299654" />
+    <state width="617" height="215" key="GridCell.Tab.0.bottom" timestamp="1597490225252">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="1163" height="155" key="GridCell.Tab.0.bottom/0.0.1280.680@0.0.1280.680" timestamp="1597415813977" />
+    <state width="617" height="215" key="GridCell.Tab.0.bottom/0.0.1280.680@0.0.1280.680" timestamp="1597490225252" />
     <state width="851" height="752" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1591443073088" />
-    <state width="1163" height="155" key="GridCell.Tab.0.center" timestamp="1597415813977">
+    <state width="617" height="215" key="GridCell.Tab.0.center" timestamp="1597490225252">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="1163" height="155" key="GridCell.Tab.0.center/0.0.1280.680@0.0.1280.680" timestamp="1597415813977" />
+    <state width="617" height="215" key="GridCell.Tab.0.center/0.0.1280.680@0.0.1280.680" timestamp="1597490225252" />
     <state width="851" height="752" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1591443073088" />
-    <state width="1163" height="155" key="GridCell.Tab.0.left" timestamp="1597415813977">
+    <state width="617" height="215" key="GridCell.Tab.0.left" timestamp="1597490225252">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="1163" height="155" key="GridCell.Tab.0.left/0.0.1280.680@0.0.1280.680" timestamp="1597415813977" />
+    <state width="617" height="215" key="GridCell.Tab.0.left/0.0.1280.680@0.0.1280.680" timestamp="1597490225252" />
     <state width="851" height="752" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1591443073088" />
-    <state width="1163" height="155" key="GridCell.Tab.0.right" timestamp="1597415813977">
+    <state width="617" height="215" key="GridCell.Tab.0.right" timestamp="1597490225252">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="1163" height="155" key="GridCell.Tab.0.right/0.0.1280.680@0.0.1280.680" timestamp="1597415813977" />
+    <state width="617" height="215" key="GridCell.Tab.0.right/0.0.1280.680@0.0.1280.680" timestamp="1597490225252" />
     <state width="851" height="752" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1591443073088" />
     <state width="676" height="244" key="GridCell.Tab.1.bottom" timestamp="1591439112048">
       <screen x="0" y="0" width="1920" height="1040" />
