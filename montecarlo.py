@@ -7,12 +7,10 @@ import statistics
 import copy
 import numpy as np
 import preprocessor
-from datetime import datetime
-
 from visualize_tree import visualize_tree
 
 # For a given user, we want deterministic results
-random.seed(0)
+random.seed()
 
 # Hyper Parameters
 MONTE_CARLO_ITERS_NUM = 10000  # Number of monte-carlo iteration, where each iteration is made of up selection, expansion, simulation and backpropogaition
@@ -140,7 +138,7 @@ def create_action_name(feature, value):
         new_bank = seller_names[int(value) - 1]
         return str("Request from a different bank:" + str(new_bank))
 
-    if feature == 4:
+    if feature == 3:
         return str("Change your UPB to " + str(value*features_np_array[feature]))
 
     if feature == 5:
@@ -156,7 +154,7 @@ def create_action_name(feature, value):
         return str("Change your debt-to-income ratio to " + str(value * features_np_array[feature]))
 
     if feature == 9:
-        return str("Change your credit score to " + str(value * features_np_array[feature]))
+        return str("Change your credit score ratio to " + str(value * features_np_array[feature]))
 
     if feature == 10:
         if value == 1:
@@ -174,13 +172,13 @@ def create_action_name(feature, value):
         if value == 4:
             return str("Request a general refinance loan without declaring whether it's for cash-out")
 
-    if feature == 12:
+    if feature == 13:
         if value == 1:
             return str("Request a property which consists of 1 unit")
         else:
             return str("Request a property which consists of " + str(value) + " units")
 
-    if feature == 13:
+    if feature == 14:
         if value == 1:
             return str("Request as your principal property")
         if value == 2:
@@ -361,7 +359,6 @@ def generate_actions (feature,values,curr_value, is_discrete):
         actions.append(TempAction)
     return actions
 
-print('First timestep', datetime.now())
 #Load the statistics about the data
 stats = pd.read_csv('dataset\statistics.csv')
 stats_mean = stats.iloc[1]
@@ -370,9 +367,13 @@ stats_std = stats.iloc[2]
 # Load request data and tokenize
 df = pd.read_csv('dataset\montecarlo_trial.csv', names=preprocessor.COL_NAMES)
 df = preprocessor.prep_columns(df)
-
-
+print(df.iloc[0, :])
+input()
 features_np_array = (df.iloc[0, :-1]).astype(float).to_numpy()
+#print(features_np_array)
+#input()
+#print(preprocessor.norm_features(df.iloc[0, :-1], stats))
+#input()
 
 #Generating actions for each feature:
 actions = {} ##Initializing an empty dictionary of actions, where the key is the feature number it affects, and the value is a list of actions
@@ -401,6 +402,9 @@ NUMBER_OF_ACTIONS = len(actions_list)
 MEAN_ACTION_COST = statistics.mean([action.cost for action in actions_list]) # List Comprehension - create a list of only the costs of all of the actions
 
 features_tensor = torch.from_numpy(features_np_array).type(torch.FloatTensor)
+#print(preprocessor.norm_features(features_tensor, stats))
+#print(preprocessor.norm_features(features_tensor, stats))
+#input()
 root = Tree(features_tensor)
 root.action = Action(action_id=0, action_name="current_state", action_value=0, cost_value=0, feature_number=0) #We create a fictive action for the root, just to make sure the algorithm runs well. We will delete this from the proposed list.
 
@@ -408,5 +412,4 @@ net = main.Net(DROPOUT_RATE=0.1)
 net.load_state_dict(torch.load('models/final_weights.pkl', map_location='cpu'))
 
 res = monte_carlo_tree_search(root)
-print(res)
-print('Second timestep', datetime.now())
+#print(res)
