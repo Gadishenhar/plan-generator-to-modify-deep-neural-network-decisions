@@ -138,7 +138,7 @@ def create_action_name(feature, value):
         new_bank = seller_names[int(value) - 1]
         return str("Request from a different bank:" + str(new_bank))
 
-    if feature == 3:
+    if feature == 4:
         return str("Change your UPB to " + str(value*features_np_array[feature]))
 
     if feature == 5:
@@ -172,13 +172,13 @@ def create_action_name(feature, value):
         if value == 4:
             return str("Request a general refinance loan without declaring whether it's for cash-out")
 
-    if feature == 13:
+    if feature == 12:
         if value == 1:
             return str("Request a property which consists of 1 unit")
         else:
             return str("Request a property which consists of " + str(value) + " units")
 
-    if feature == 14:
+    if feature == 13:
         if value == 1:
             return str("Request as your principal property")
         if value == 2:
@@ -367,8 +367,6 @@ stats_std = stats.iloc[2]
 # Load request data and tokenize
 df = pd.read_csv('dataset\montecarlo_trial.csv', names=preprocessor.COL_NAMES)
 df = preprocessor.prep_columns(df)
-print(df.iloc[0, :])
-input()
 features_np_array = (df.iloc[0, :-1]).astype(float).to_numpy()
 #print(features_np_array)
 #input()
