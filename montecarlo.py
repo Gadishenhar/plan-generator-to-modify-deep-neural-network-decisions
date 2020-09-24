@@ -7,13 +7,14 @@ import statistics
 import copy
 import numpy as np
 import preprocessor
+import matplotlib.pyplot
 from visualize_tree import visualize_tree
 
 # For a given user, we want deterministic results
 random.seed()
 
 # Hyper Parameters
-MONTE_CARLO_ITERS_NUM = 10000  # Number of monte-carlo iteration, where each iteration is made of up selection, expansion, simulation and backpropogaition
+MONTE_CARLO_ITERS_NUM = 1000000 # Number of monte-carlo iteration, where each iteration is made of up selection, expansion, simulation and backpropogaition
 NET_THRESHOLD = 0.5 # The threshold of the network's output for which we determine it changed its decision
 EXPANSION_MAX_DEPTH = 3  # The maximal depth of the real built tree
 SIMULATION_MAX_DEPTH = 3  # The maximal total depth of the simulated tree
@@ -45,9 +46,9 @@ class Tree (object):
 
 def monte_carlo_tree_search(root):
 
-    for i in range(MONTE_CARLO_ITERS_NUM):
+    scores = np.array([])
 
-        print(i)
+    for i in range(MONTE_CARLO_ITERS_NUM):
 
         # Selection stage
         path_to_leaf = selection(root)
@@ -71,9 +72,16 @@ def monte_carlo_tree_search(root):
         path_to_leaf.append(next_child)
         backpropogation(path_to_leaf, is_successful)
 
+        # Look at the current score of the best path
+        _, best_score = best_route(root)
+        scores = np.append(scores, best_score)
+        print(i, best_score)
+
+    matplotlib.pyplot.plot(scores[1000:])
+    matplotlib.pyplot.show()
+
     #Choose the best route of all and propose it to the user:
-    proposed_actions = []
-    proposed_actions = best_route(root)
+    proposed_actions, _ = best_route(root)
 
     proposed_actions = proposed_actions[:-1]
 
@@ -171,22 +179,20 @@ def best_route(node):
 
     #Recursion stop condition:
     temp = []
-    if node.child==[]: #if it's a successful leaf: meaning there are no children
+    if node.child == []:  #if it's a successful leaf: meaning there are no children
         temp.append(node.action.action_name)
-        return temp
+        return (temp, 0)
 
     list_of_actions = []
 
     max_score = -math.inf
     max_score_idx = 1.5
     for i, child in enumerate(node.child):
-        if child.num_of_successes==0:
-            #print('Node', i, 'had no successes, and we passed through it', child.num_of_passes, 'times')
+        if child.num_of_successes == 0:
             continue
         score = A * child.num_of_successes / (child.num_of_passes + 1)
         score -= C * child.total_cost / (MEAN_ACTION_COST * child.depth)
         score -= D * child.depth
-        #('Node', i, 'has a score of', score)
         if score > max_score:
             max_score = score
             max_score_idx = i
@@ -195,13 +201,12 @@ def best_route(node):
     # and return
     if max_score_idx == 1.5:
         list_of_actions.append(node.action.action_name)
-        return list_of_actions
+        return (list_of_actions, 0)
 
-    #print('Node', max_score_idx, 'was chosen and its action is', node.child[max_score_idx].action.action_name)
-
-    list_of_actions.extend(best_route(node.child[max_score_idx]))
+    rest_of_path, rest_of_score = best_route(node.child[max_score_idx])
+    list_of_actions.extend(rest_of_path)
     list_of_actions.append(node.action.action_name)
-    return list_of_actions
+    return (list_of_actions, (max_score + rest_of_score))
 
 
 def generate_actions (feature,values,curr_value, is_discrete):
@@ -362,18 +367,18 @@ features_np_array = (df.iloc[0, :-1]).astype(float).to_numpy()
 actions = {} ##Initializing an empty dictionary of actions, where the key is the feature number it affects, and the value is a list of actions
 actions[0] = (generate_actions(0,[1,2,3],df,True))  # Origination channel
 actions[1] = (generate_actions(1,list(range(1,97)),df,True))  # Seller name
-actions[4] = (generate_actions(4,list(np.arange(999,500,-15)/1000),df,False)) # UPB - Decrease by up to 50%
-actions[5] = (generate_actions(5,list(np.arange(999,500,-15)/1000),df,False)) # LTV - Decrease by up to 50%
-actions[6] = (generate_actions(6,list(np.arange(999,500,-15)/1000),df,False))  # CLTV
+actions[4] = (generate_actions(4,list(np.arange(999,500,-99)/1000),df,False)) # UPB - Decrease by up to 50%
+actions[5] = (generate_actions(5,list(np.arange(999,500,-99)/1000),df,False)) # LTV - Decrease by up to 50%
+actions[6] = (generate_actions(6,list(np.arange(999,500,-99)/1000),df,False))  # CLTV
 actions[7] = (generate_actions(7,[1,2,3],df,True)) ##Number of borrowers
-actions[8] = (generate_actions(8,list(np.arange(999,500,-15)/1000),df,False))  # Debt to income
-actions[9] = (generate_actions(9,list(np.arange(1001,1500, 15)/1000),df,False))  # Credit Score
+actions[8] = (generate_actions(8,list(np.arange(999,500,-99)/1000),df,False))  # Debt to income
+actions[9] = (generate_actions(9,list(np.arange(1001,1500, 99)/1000),df,False))  # Credit Score
 actions[10] = (generate_actions(10,[1,2],df,True)) #First time home buyer
 actions[11] = (generate_actions(11,list(range(1,4)),df,True)) #LOAN PURPOSE
 actions[12] = (generate_actions(12,list(range(1,5)),df,True)) # Number of units
 actions[13] = (generate_actions(13,list(range(1,4)),df,True)) # Occupancy Type
-actions[16] = (generate_actions(16,list(np.arange(1001,1500, 15)/1000),df,False))  # PRIMARY MORTGAGE INSURANCE PERCENT
-actions[18] = (generate_actions(18,list(np.arange(1001,1500, 15)/1000),df,False))  # CoBorrower Credit Score
+actions[16] = (generate_actions(16,list(np.arange(1001,1500, 99)/1000),df,False))  # PRIMARY MORTGAGE INSURANCE PERCENT
+actions[18] = (generate_actions(18,list(np.arange(1001,1500, 99)/1000),df,False))  # CoBorrower Credit Score
 actions[19] = (generate_actions(19,list(range(1,4)),df,True)) #MORTGAGE INSURANCE TYPE
 actions[20] = (generate_actions(20,list(range(1,3)),df,True)) #RELOCATION MORTGAGE INDICATOR
 
@@ -381,7 +386,6 @@ actions[20] = (generate_actions(20,list(range(1,3)),df,True)) #RELOCATION MORTGA
 actions_list = []
 for key in actions:
     actions_list.extend(actions[key])
-NUMBER_OF_ACTIONS = len(actions_list)
 MEAN_ACTION_COST = statistics.mean([action.cost for action in actions_list]) # List Comprehension - create a list of only the costs of all of the actions
 
 features_tensor = torch.from_numpy(features_np_array).type(torch.FloatTensor)
