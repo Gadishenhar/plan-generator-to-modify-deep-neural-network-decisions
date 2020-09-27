@@ -11,17 +11,18 @@ import matplotlib.pyplot
 from visualize_tree import visualize_tree
 
 # For a given user, we want deterministic results
-random.seed()
+# For 5-5 use 15
+random.seed(15)
 
 # Hyper Parameters
-MONTE_CARLO_ITERS_NUM = 1000000 # Number of monte-carlo iteration, where each iteration is made of up selection, expansion, simulation and backpropogaition
+MONTE_CARLO_ITERS_NUM = 1000 # Number of monte-carlo iteration, where each iteration is made of up selection, expansion, simulation and backpropogaition
 NET_THRESHOLD = 0.5 # The threshold of the network's output for which we determine it changed its decision
-EXPANSION_MAX_DEPTH = 3  # The maximal depth of the real built tree
-SIMULATION_MAX_DEPTH = 3  # The maximal total depth of the simulated tree
-A = 1 # The constant that measures the weight we give to the number of successes when traveling the tree
-B = math.sqrt(2) # The constant that measures the weight we give to the number of visits
-C = 2 # The constant that measures the weight we give to the cost of the chosen actions
-D = math.sqrt(2) # The constant that measures the weight we give to the tree's depth
+EXPANSION_MAX_DEPTH = 5  # The maximal depth of the real built tree
+SIMULATION_MAX_DEPTH = 5  # The maximal total depth of the simulated tree
+A = 1.0 # The constant that measures the weight we give to the number of successes when traveling the tree
+B = 4.0 # The constant that measures the weight we give to the number of visits
+C = 2.5 # The constant that measures the weight we give to the cost of the chosen actions
+D = 0.25 # The constant that measures the weight we give to the tree's depth
 
 class Action:
     def __init__(self, action_id, action_name, action_value, cost_value, feature_number):
@@ -73,11 +74,11 @@ def monte_carlo_tree_search(root):
         backpropogation(path_to_leaf, is_successful)
 
         # Look at the current score of the best path
-        _, best_score = best_route(root)
+        best_plan, best_score = best_route(root)
         scores = np.append(scores, best_score)
-        print(i, best_score)
+        print(i, str(best_plan))
 
-    matplotlib.pyplot.plot(scores[1000:])
+    matplotlib.pyplot.plot(scores[1:])
     matplotlib.pyplot.show()
 
     #Choose the best route of all and propose it to the user:
@@ -86,8 +87,10 @@ def monte_carlo_tree_search(root):
     proposed_actions = proposed_actions[:-1]
 
     if proposed_actions==[]:
+        print('[]')
         return str("No reasonable changes to help your application become approved have been found.")
 
+    print(str(proposed_actions))
     return str("In order to make your mortgage application approved: " + str(proposed_actions))
 
 
@@ -97,20 +100,13 @@ def selection(node):
     if len(node.child) == 0:
         return [node]
 
-
-    # Weight parameters
-    A = 1
-    B = math.sqrt(2)
-    C = math.sqrt(2)
-    D = math.sqrt(2)
-
     max_score = -math.inf
     max_score_idx = -1
     for i, child in enumerate(node.child):
         score = A * child.num_of_successes / (child.num_of_passes + 1)
-        score += B * math.sqrt(math.log(node.num_of_passes + 1) / (child.num_of_passes + 1))
-        score -= C * child.total_cost / (MEAN_ACTION_COST * child.depth)
-        score -= D * child.depth
+        score -= B * math.sqrt((child.num_of_passes + 1) / (node.num_of_passes + 1))
+        score -= abs(C * child.total_cost / (MEAN_ACTION_COST * child.depth))
+        score -= abs(D * child.depth)
         if score > max_score:
             max_score = score
             max_score_idx = i
@@ -124,11 +120,13 @@ def expansion(leaf):
 
     # Per Ronen's request, we examine all of the actions, and not a random subset
     for action in actions_list:
+        if action.feature == leaf.action.feature:
+            continue
         leaf.child.append(Tree(leaf.data))  # Add child to the current node
         child = leaf.child[-1]
         child.action = action
         child.depth = leaf.depth + 1
-        child.total_cost = leaf.total_cost + action.cost
+        child.total_cost = action.cost #leaf.total_cost + action.cost
         child.data[child.action.feature] = child.action.action_value * child.data[child.action.feature]
 
     # Pick random child to go down
@@ -183,30 +181,37 @@ def best_route(node):
         temp.append(node.action.action_name)
         return (temp, 0)
 
-    list_of_actions = []
-
     max_score = -math.inf
     max_score_idx = 1.5
     for i, child in enumerate(node.child):
+
+        # We have no use in unsuccessful children
         if child.num_of_successes == 0:
             continue
-        score = A * child.num_of_successes / (child.num_of_passes + 1)
-        score -= C * child.total_cost / (MEAN_ACTION_COST * child.depth)
-        score -= D * child.depth
+
+        score = 0 * child.num_of_successes / (child.num_of_passes + 1)
+        score -= abs(C * child.total_cost / (MEAN_ACTION_COST * child.depth))
+        score -= abs(0 * child.depth)
+
+        # Assume we take the best path from this child forward
+        _, rest_of_score = best_route(child)
+        score += rest_of_score
+
         if score > max_score:
             max_score = score
             max_score_idx = i
 
     # If this node has no successful children at all, just add the current action
     # and return
+    list_of_actions = []
     if max_score_idx == 1.5:
         list_of_actions.append(node.action.action_name)
-        return (list_of_actions, 0)
+        return (list_of_actions, -math.inf)
 
-    rest_of_path, rest_of_score = best_route(node.child[max_score_idx])
+    rest_of_path, _ = best_route(node.child[max_score_idx])
     list_of_actions.extend(rest_of_path)
     list_of_actions.append(node.action.action_name)
-    return (list_of_actions, (max_score + rest_of_score))
+    return list_of_actions, max_score
 
 
 def generate_actions (feature,values,curr_value, is_discrete):
